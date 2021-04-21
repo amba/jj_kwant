@@ -9,17 +9,26 @@ import scipy.sparse.linalg
 import scipy.linalg
 
 import tinyarray
-
+from datetime import datetime
 import scipy.constants as const
-
+import pathlib
+import time
 
 sigma_0 = tinyarray.array([[1, 0], [0, 1]])
 sigma_x = tinyarray.array([[0, 1], [1, 0]])
 sigma_y = tinyarray.array([[0, -1j], [1j,0]])
 sigma_z = tinyarray.array([[1, 0], [0,-1]])
 
+date_string = datetime.now()
+date_string = date_string.strftime("%Y-%m-%d_%H-%M-%S")
+data_folder = date_string + "_JJ"
 
-def make_syst(m = 0.03 * const.m_e, a=10e-9, W=10, L=10, junction_length=-0.1e-9):
+print("data folder: ", data_folder)
+pathlib.Path(data_folder).mkdir()
+
+    
+
+def make_syst(m = 0.03 * const.m_e, a=5e-9, W=10, L=10, junction_length=-0.1e-9):
     t = const.hbar**2 / (2 * m * a**2)
     print(t)
     
@@ -44,56 +53,88 @@ def make_syst(m = 0.03 * const.m_e, a=10e-9, W=10, L=10, junction_length=-0.1e-9
 
     
     syst[(lat(x,y) for x in range(L) for y in range(W))] = onsite
+
+    
     # Hoppings
-    
     syst[lat.neighbors()] = -t * sigma_z
+
+    # Need periodic boundaries x=L-1 <-> x = 0
+    for j in range(W):
+        syst[lat(0,j), lat(L-1,j)] = -t * sigma_z
+
     
-    #  syst[kwant.builder.HoppingKind((0,1), lat, lat)] = -t * sigma_0
     # kwant.plot(syst)
     return syst.finalized()
 
-W = 10
-n_phi = 50
+a = 5e-9
+W = 300
+width = a * W
+print("width = %.3g μm" % (width * 1e6))
+L = 600 + 1
+n_phi = 20
 n_s = 1e16
 m_eff = 0.03 * const.m_e
 E_fermi = const.hbar**2 * 2 * np.pi * n_s / (2 * m_eff)
+k_fermi = np.sqrt(2 * m_eff * E_fermi) / const.hbar
+lambda_fermi = 2 * np.pi / k_fermi
+mu = E_fermi
+n_bound_states = 2 * width / lambda_fermi # with spin: 4 * width / lambda_fermi
 
-#for L in (100, 200, 300, 400):
-for L in (100,):
-    L = L+1
-    mu = E_fermi
-    print("E_fermi = %.3g (meV)" % (1000 * mu / const.e))
-    Gap = 0.2e-3 * const.e
-    junction_length = 100e-9
+print("E_fermi = %.3g meV, λ_fermi = %.3g nm, N0 = %.2g" % (1000 * mu / const.e, lambda_fermi * 1e9, n_bound_states))
 
-    syst = make_syst(L=L, W=W, junction_length=junction_length)
+L = L+1
+Gap = 200e-6 * const.e
+junction_length = 50e-9
 
-    phi_vals = np.linspace(-0.1*np.pi, 1.1*np.pi, n_phi)
-    energies = []
-    free_energies = []
-    for phi in phi_vals:
-        print(phi/np.pi)
-        ham_mat = syst.hamiltonian_submatrix(params=dict(Gap=Gap, mu=mu, delta_phi=phi), sparse=True)
-        ham_mat = ham_mat.tocsc()
+syst = make_syst(a=5e-9, L=L, W=W, junction_length=junction_length)
 
-        k=50
-        evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False)
-        evs = evs / Gap
-        energies.append(evs)
-        free_energies.append(-np.sum(evs))
+phi_vals = np.linspace(-0.1*np.pi, 1.1*np.pi, n_phi)
+energies = []
+free_energies = []
+for phi in phi_vals:
+    t1 = time.time()
+    print("phi = %.3g π" % (phi/np.pi))
+    ham_mat = syst.hamiltonian_submatrix(params=dict(Gap=Gap, mu=mu, delta_phi=phi), sparse=True)
+    ham_mat = ham_mat.tocsc()
+
+    k= int(n_bound_states)
+    evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False)
+    evs = evs
+    energies.append(evs)
+    free_energies.append(-np.sum(evs))
+    print("execution time: %.1f s" % (time.time() - t1))
+free_energies = 2 * np.array(free_energies) # include 2 for spin
+energies = np.array(energies)
+current = 2 * const.e / const.hbar * np.gradient(free_energies)
+
+current_modes = current * const.hbar / (const.e * Gap)
+
     
-    free_energies = np.array(free_energies)
-    current = np.gradient(free_energies)
-    plt.grid()
-    plt.xlabel('φ/π')
-    plt.plot(phi_vals/np.pi, energies)
-    plt.show()
-    plt.plot(phi_vals/np.pi, current, label="W = %d, L = %d, Δ = %.3g meV, μ = %.3g meV" % (W, L, 1000 * Gap / const.e, 1000 * mu / const.e))
-    plt.legend()
-    plt.show()
+plt.grid()
+plt.xlabel('φ/π')
+plt.plot(phi_vals/np.pi, energies/Gap)
+data_title = data_folder + "/L=%d,W=%d,L_junction=%d_" % (L, W, junction_length)
+plt.savefig(data_title + 'energies.pdf')
+
+plt.clf()
+
+plt.xlabel('φ/π')
+plt.grid()
+plt.ylabel('current (μA)')
+
+
+
+plt.plot(phi_vals/np.pi, current*1e6, label="W = %d, L = %d, Δ = %.3g meV, μ = %.3g meV" % (W, L, 1000 * Gap / const.e, 1000 * mu / const.e))
+plt.legend()
+plt.savefig(data_title + 'current-phase.pdf')
+
+data_block = np.array([phi_vals, free_energies, current, current_modes]).T
+data_block_header = "phi\t\tfree-energy\t\tcurrent\t\tmodes"
+np.savetxt(data_title + 'current-phase.txt', data_block, fmt="%.17g",
+           header=data_block_header, delimiter="\t\t", footer="\n")
+
 
 # plt.ylabel('E/Δ')
-# plt.xlabel('φ/π')
 # plt.legend()
 
 # plt.plot(phi_vals/np.pi, energies)
