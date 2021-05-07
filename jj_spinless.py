@@ -18,10 +18,10 @@ import time
 a = 5e-9
 
 # width of josephson junction
-width = 3e-6
+width = 1e-6
 
 
-electrode_length = 3e-6
+electrode_length = 2e-6
 
 junction_length = 100e-9
 
@@ -80,8 +80,8 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
         if x > L/2:
             dphi = -dphi
 
-        start_junction = int(L_junction - junction_length) / 2
-        if x < start_junction or x >= start_junction + junction_length:
+        start_junction = int((L - L_junction) / 2)
+        if x < start_junction or x >= start_junction + L_junction:
             pot = pot + Gap * (sigma_x * np.cos(dphi/2) - sigma_y * np.sin(dphi/2))
         return pot
     
@@ -122,9 +122,11 @@ for Gap in gaps:
     t1 = time.time()
     print("time for make_syst: %.3g" % (t1 - t0))
     ham_mat = syst.hamiltonian_submatrix(sparse=True)
+    print("Hamiltonian shape: ", ham_mat.shape)
     ham_mat = ham_mat.tocsc()
 
     k= int(n_bound_states)
+    print("calculating %d eigenvalues" % k)
     evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False)
     evs = evs
     energies.append(evs)
