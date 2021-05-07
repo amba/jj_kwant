@@ -23,6 +23,7 @@ parser.add_argument('--electrode-length', help="electrode length in m", required
 parser.add_argument('--carrier-density', help="carrier density / m^2 (default: 1e16)", default=1e16, type=float)
 parser.add_argument('--mass', help="effective mass / m_e(default: 0.03)", default=0.03, type=float)
 parser.add_argument('--gap', help="superconducting gap / eV (default: 200e-6)", default=200e-6, type=float)
+parser.add_argument('--n-phi', help="number of values of phase difference (default: 20)", default=20, type=int)
 
 args = parser.parse_args()
 a = args.lattice_constant
@@ -40,7 +41,8 @@ n_s = args.carrier_density
 
 m_eff = args.mass * const.m_e
 
-n_phi = 20
+n_phi = args.n_phi
+
 
 E_fermi = const.hbar**2 * 2 * np.pi * n_s / (2 * m_eff)
 k_fermi = np.sqrt(2 * m_eff * E_fermi) / const.hbar
@@ -132,7 +134,7 @@ for phi in phi_vals:
     print("Hamiltonian shape: ", ham_mat.shape)
     ham_mat = ham_mat.tocsc()
 
-    k= int(n_bound_states)
+    k= 2 * int(n_bound_states)
     print("calculating %d eigenvalues" % k)
     evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False)
     evs = evs
