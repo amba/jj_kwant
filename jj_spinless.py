@@ -13,26 +13,35 @@ from datetime import datetime
 import scipy.constants as const
 import pathlib
 import time
+import argparse
 
-# lattice constant for discretization
-a = 5e-9
+parser = argparse.ArgumentParser()
+parser.add_argument('-a', '--lattice-constant', default=5e-9, help="lattice constant", type=float)
+parser.add_argument('--width', help="width of structure in m", required=True, type=float)
+parser.add_argument('--junction-length', help="junction length in m", required=True, type=float)
+parser.add_argument('--electrode-length', help="electrode length in m", required=True, type=float)
+parser.add_argument('--carrier-density', help="carrier density / m^2 (default: 1e16)", default=1e16, type=float)
+parser.add_argument('--mass', help="effective mass / m_e(default: 0.03)", default=0.03, type=float)
+parser.add_argument('--gap', help="superconducting gap / eV (default: 200e-6)", default=200e-6, type=float)
+
+args = parser.parse_args()
+a = args.lattice_constant
 
 # width of josephson junction
-width = 1e-6
+width = args.width
 
 
-electrode_length = 2e-6
+electrode_length = args.electrode_length
 
-junction_length = 100e-9
+junction_length = args.junction_length
 
+gap = args.gap * const.e
+n_s = args.carrier_density
 
-print("width = %.3g μm")
-
-Gap = 200e-6 * const.e
+m_eff = args.mass * const.m_e
 
 n_phi = 20
-n_s = 1e16
-m_eff = 0.03 * const.m_e
+
 E_fermi = const.hbar**2 * 2 * np.pi * n_s / (2 * m_eff)
 k_fermi = np.sqrt(2 * m_eff * E_fermi) / const.hbar
 lambda_fermi = 2 * np.pi / k_fermi
@@ -55,7 +64,7 @@ pathlib.Path(data_folder).mkdir()
 
 def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
               electrode_length = 3e-6, junction_length=100e-9,
-              mu=0, Gap=0, delta_phi=0):
+              mu=0, gap=0, delta_phi=0):
     t = const.hbar**2 / (2 * m * a**2)
     print(f"m = {m}, a = {a}, width = {width}, electrode_length = {electrode_length}, junction_length = {junction_length}, t = {t}")
     W = int(width/a)
@@ -82,7 +91,7 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
 
         start_junction = int((L - L_junction) / 2)
         if x < start_junction or x >= start_junction + L_junction:
-            pot = pot + Gap * (sigma_x * np.cos(dphi/2) - sigma_y * np.sin(dphi/2))
+            pot = pot + gap * (sigma_x * np.cos(dphi/2) - sigma_y * np.sin(dphi/2))
         return pot
     
     syst[(lat(x,y) for x in range(L) for y in range(W))] = onsite
@@ -99,8 +108,8 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
     def onsite_01(site):
         return np.abs(onsite(site)[1, 0])
     
-    # kwant.plot(syst,site_color=onsite_00)
-    # kwant.plot(syst,site_color=onsite_01)
+#    kwant.plot(syst,site_color=onsite_00)
+ #   kwant.plot(syst,site_color=onsite_01)
     
     return syst.finalized()
 
@@ -112,13 +121,11 @@ print("E_fermi = %.3g meV, λ_fermi = %.3g nm, N0 = %.2g" % (1000 * mu / const.e
 phi_vals = np.linspace(-0.1*np.pi, 1.1*np.pi, n_phi)
 energies = []
 free_energies = []
-gaps = np.linspace(0, Gap, 5)
-for Gap in gaps:
-    phi = 0
+for phi in phi_vals:
     print("phi = %.3g π" % (phi/np.pi))
     print("make syst")
     t0 = time.time()
-    syst = make_syst(a=5e-9, width=width, electrode_length=electrode_length, junction_length=junction_length, mu=mu, Gap=Gap, delta_phi=phi)
+    syst = make_syst(a=5e-9, width=width, electrode_length=electrode_length, junction_length=junction_length, mu=mu, gap=gap, delta_phi=phi)
     t1 = time.time()
     print("time for make_syst: %.3g" % (t1 - t0))
     ham_mat = syst.hamiltonian_submatrix(sparse=True)
@@ -136,17 +143,14 @@ for Gap in gaps:
 free_energies = 2 * np.array(free_energies) # include 2 for spin
 energies = np.array(energies)
 
-plt.plot(gaps / Gap , energies/Gap)
-plt.show()
-
 current = 2 * const.e / const.hbar * np.gradient(free_energies)
 
-current_modes = current * const.hbar / (const.e * Gap)
+current_modes = current * const.hbar / (const.e * gap)
 
     
 plt.grid()
 plt.xlabel('φ/π')
-plt.plot(phi_vals/np.pi, energies/Gap)
+plt.plot(phi_vals/np.pi, energies/gap)
 plt.savefig(data_folder + '/energies.pdf')
 
 plt.clf()
@@ -155,9 +159,7 @@ plt.xlabel('φ/π')
 plt.grid()
 plt.ylabel('current (μA)')
 
-
-
-plt.plot(phi_vals/np.pi, current*1e6, label="W = %d, L = %d, Δ = %.3g meV, μ = %.3g meV" % (W, L, 1000 * Gap / const.e, 1000 * mu / const.e))
+plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, Δ = %.3g meV, μ = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
 plt.legend()
 plt.savefig(data_folder + '/current-phase.pdf')
 
