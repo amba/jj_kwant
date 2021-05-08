@@ -68,11 +68,11 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
               electrode_length = 3e-6, junction_length=100e-9,
               mu=0, gap=0, delta_phi=0):
     t = const.hbar**2 / (2 * m * a**2)
-    print(f"m = {m}, a = {a}, width = {width}, electrode_length = {electrode_length}, junction_length = {junction_length}, t = {t}")
+    print("m = %g, a = %g, width = %g, electrode_length = %g, junction_length = %g, t = %g" % (m, a, width, electrode_length, junction_length, t))
     W = int(width/a)
     L = int((2*electrode_length + junction_length) / a)
     L_junction = int(junction_length/a)
-    print(f"L = {L}, W = {W}, L_junction = {L_junction}")
+    print("L = %d, W = %d, L_junction = %d" % (L, W, L_junction))
     lat = kwant.lattice.square(1)
     
 
