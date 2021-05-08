@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -155,17 +156,17 @@ current_modes = current * const.hbar / (const.e * gap)
 
     
 plt.grid()
-plt.xlabel('φ/π')
+plt.xlabel('phi/π')
 plt.plot(phi_vals/np.pi, energies/gap)
 plt.savefig(data_folder + '/energies.pdf')
 
 plt.clf()
 
-plt.xlabel('φ/π')
+plt.xlabel('phi/π')
 plt.grid()
-plt.ylabel('current (μA)')
+plt.ylabel('current (mu A)')
 
-plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, Δ = %.3g meV, μ = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
+plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, Δ = %.3g meV, fermi_energy = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
 plt.legend()
 plt.savefig(data_folder + '/current-phase.pdf')
 
