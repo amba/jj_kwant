@@ -18,13 +18,14 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-a', '--lattice-constant', default=5e-9, help="lattice constant", type=float)
-parser.add_argument('--width', help="width of structure in m", required=True, type=float)
-parser.add_argument('--junction-length', help="junction length in m", required=True, type=float)
-parser.add_argument('--electrode-length', help="electrode length in m", required=True, type=float)
+parser.add_argument('-w', '--width', help="width of structure in m", required=True, type=float)
+parser.add_argument('-l', '--junction-length', help="junction length in m", required=True, type=float)
+parser.add_argument('-e', '--electrode-length', help="electrode length in m", required=True, type=float)
 parser.add_argument('--carrier-density', help="carrier density / m^2 (default: 1e16)", default=1e16, type=float)
 parser.add_argument('--mass', help="effective mass / m_e(default: 0.03)", default=0.03, type=float)
 parser.add_argument('--gap', help="superconducting gap / eV (default: 200e-6)", default=200e-6, type=float)
 parser.add_argument('--n-phi', help="number of values of phase difference (default: 20)", default=20, type=int)
+parser.add_argument('--tol', help="stopping accuracy of eigenvalues (default: 1e-3)", type=float, default=1e-3)
 
 args = parser.parse_args()
 a = args.lattice_constant
@@ -44,6 +45,7 @@ m_eff = args.mass * const.m_e
 
 n_phi = args.n_phi
 
+tolerance = args.tol
 
 E_fermi = const.hbar**2 * 2 * np.pi * n_s / (2 * m_eff)
 k_fermi = np.sqrt(2 * m_eff * E_fermi) / const.hbar
@@ -139,9 +141,9 @@ for phi in phi_vals:
     t1 = time.time()
     print("time for make_hamiltonian: ", t1 - t0)
     
-    k= 2 * int(n_bound_states)
+    k= 2 * int(n_bound_states + 1)
     print("calculating %d eigenvalues" % k)
-    evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False)
+    evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False, tol=tolerance)
     evs = evs
     energies.append(evs)
     free_energies.append(-np.sum(evs))
