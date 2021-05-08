@@ -123,7 +123,7 @@ def make_hamiltonian_sparse_csc(*args, **kwargs):
     ham_mat = ham_mat.tocsc()
     return ham_mat
 
-print("E_fermi = %.3g meV, λ_fermi = %.3g nm, N0 = %.2g" % (1000 * mu / const.e, lambda_fermi * 1e9, n_bound_states))
+print("E_fermi = %.3g meV, lambda_fermi = %.3g nm, N0 = %.2g" % (1000 * mu / const.e, lambda_fermi * 1e9, n_bound_states))
 
 
 
