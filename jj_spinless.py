@@ -115,6 +115,12 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
     
     return syst.finalized()
 
+def make_hamiltonian_sparse_csc(*args, **kwargs):
+    syst = make_syst(*args, **kwargs)
+    ham_mat = syst.hamiltonian_submatrix(sparse=True)
+    print("Hamiltonian shape: ", ham_mat.shape)
+    ham_mat = ham_mat.tocsc()
+    return ham_mat
 
 print("E_fermi = %.3g meV, λ_fermi = %.3g nm, N0 = %.2g" % (1000 * mu / const.e, lambda_fermi * 1e9, n_bound_states))
 
@@ -127,13 +133,11 @@ for phi in phi_vals:
     print("phi = %.3g π" % (phi/np.pi))
     print("make syst")
     t0 = time.time()
-    syst = make_syst(a=5e-9, width=width, electrode_length=electrode_length, junction_length=junction_length, mu=mu, gap=gap, delta_phi=phi)
-    t1 = time.time()
-    print("time for make_syst: %.3g" % (t1 - t0))
-    ham_mat = syst.hamiltonian_submatrix(sparse=True)
-    print("Hamiltonian shape: ", ham_mat.shape)
-    ham_mat = ham_mat.tocsc()
 
+    ham_mat = make_hamiltonian_sparse_csc(a=5e-9, width=width, electrode_length=electrode_length, junction_length=junction_length, mu=mu, gap=gap, delta_phi=phi)
+    t1 = time.time()
+    print("time for make_hamiltonian: ", t1 - t0)
+    
     k= 2 * int(n_bound_states)
     print("calculating %d eigenvalues" % k)
     evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False)
