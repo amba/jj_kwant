@@ -131,7 +131,7 @@ phi_vals = np.linspace(-0.1*np.pi, 1.1*np.pi, n_phi)
 energies = []
 free_energies = []
 for phi in phi_vals:
-    print("phi = %.3g π" % (phi/np.pi))
+    print("phi = %.3g pi" % (phi/np.pi))
     print("make syst")
     t0 = time.time()
 
@@ -156,17 +156,17 @@ current_modes = current * const.hbar / (const.e * gap)
 
     
 plt.grid()
-plt.xlabel('phi/π')
+plt.xlabel('phi/pi')
 plt.plot(phi_vals/np.pi, energies/gap)
 plt.savefig(data_folder + '/energies.pdf')
 
 plt.clf()
 
-plt.xlabel('phi/π')
+plt.xlabel('phi/pi')
 plt.grid()
 plt.ylabel('current (mu A)')
 
-plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, Δ = %.3g meV, fermi_energy = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
+plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, delta = %.3g meV, fermi_energy = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
 plt.legend()
 plt.savefig(data_folder + '/current-phase.pdf')
 
@@ -176,7 +176,7 @@ np.savetxt(data_folder + '/current-phase.txt', data_block, fmt="%.17g",
            header=data_block_header, delimiter="\t\t", footer="\n")
 
 
-# plt.ylabel('E/Δ')
+# plt.ylabel('E/delta')
 # plt.legend()
 
 # plt.plot(phi_vals/np.pi, energies)
