@@ -8,11 +8,13 @@ import kwant
 
 import scipy.sparse.linalg
 import scipy.linalg
-
+import shutil
 import tinyarray
 from datetime import datetime
 import scipy.constants as const
 import pathlib
+import os.path
+
 import time
 import argparse
 
@@ -65,7 +67,18 @@ data_folder = date_string + "_JJ_width=%g_junction_length=%g_electrode_length=%g
 print("data folder: ", data_folder)
 pathlib.Path(data_folder).mkdir()
 
-    
+# copy script into output folder
+shutil.copyfile(__file__, data_folder + '/' + os.path.basename(__file__))
+
+# create output data files
+fh_free_energy = open(data_folder + '/free_energy.dat', 'w')
+fh_free_energy.write("# phi\t\tfree-energy\n")
+
+fh_spectrum = open(data_folder + '/spectrum.dat', 'w')
+fh_spectrum.write("# phi\t\tenergy\n")
+
+# np.savetxt(data_folder + '/current-phase.txt', data_block, fmt="%.17g",
+#            header=data_block_header, delimiter="\t\t", footer="\n")
 
 def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
               electrode_length = 3e-6, junction_length=100e-9,
@@ -130,8 +143,7 @@ print("E_fermi = %.3g meV, lambda_fermi = %.3g nm, N0 = %.2g" % (1000 * mu / con
 
 
 phi_vals = np.linspace(-0.1*np.pi, 1.1*np.pi, n_phi)
-energies = []
-free_energies = []
+
 for phi in phi_vals:
     print("phi = %.3g pi" % (phi/np.pi))
     print("make syst")
@@ -141,41 +153,45 @@ for phi in phi_vals:
     t1 = time.time()
     print("time for make_hamiltonian: ", t1 - t0)
     
-    k= 2 * int(n_bound_states + 1)
+    k= int(n_bound_states + 3)
     print("calculating %d eigenvalues" % k)
     evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False, tol=tolerance)
-    evs = evs
-    energies.append(evs)
-    free_energies.append(-np.sum(evs))
+    
     print("execution time: %.1f s" % (time.time() - t1))
 
-free_energies = 2 * np.array(free_energies) # include 2 for spin
-energies = np.array(energies)
+    free_energy = -np.sum(evs)
+    np.savetxt(fh_free_energy, [[phi, free_energy]], fmt="%.10g", delimiter="\t\t")
+    for ev in (evs):
+        np.savetxt(fh_spectrum, [[phi, ev]], fmt="%.10g", delimiter="\t\t")
+    
 
-current = 2 * const.e / const.hbar * np.gradient(free_energies)
+# free_energies = np.array(free_energies)
+# energies = np.array(energies)
 
-current_modes = current * const.hbar / (const.e * gap)
+# current = 2 * const.e / const.hbar * np.gradient(free_energies)
+
+# current_modes = current * const.hbar / (const.e * gap)
 
     
-plt.grid()
-plt.xlabel('phi/pi')
-plt.plot(phi_vals/np.pi, energies/gap)
-plt.savefig(data_folder + '/energies.pdf')
+# plt.grid()
+# plt.xlabel('phi/pi')
+# plt.plot(phi_vals/np.pi, energies/gap)
+# plt.savefig(data_folder + '/energies.pdf')
 
-plt.clf()
+# plt.clf()
 
-plt.xlabel('phi/pi')
-plt.grid()
-plt.ylabel('current (mu A)')
+# plt.xlabel('phi/pi')
+# plt.grid()
+# plt.ylabel('current (mu A)')
 
-plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, delta = %.3g meV, fermi_energy = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
-plt.legend()
-plt.savefig(data_folder + '/current-phase.pdf')
+# plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, delta = %.3g meV, fermi_energy = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
+# plt.legend()
+# plt.savefig(data_folder + '/current-phase.pdf')
 
-data_block = np.array([phi_vals, free_energies, current, current_modes]).T
-data_block_header = "phi\t\tfree-energy\t\tcurrent\t\tmodes"
-np.savetxt(data_folder + '/current-phase.txt', data_block, fmt="%.17g",
-           header=data_block_header, delimiter="\t\t", footer="\n")
+# data_block = np.array([phi_vals, free_energies, current, current_modes]).T
+# data_block_header = "phi\t\tfree-energy\t\tcurrent\t\tmodes"
+# np.savetxt(data_folder + '/current-phase.txt', data_block, fmt="%.17g",
+#            header=data_block_header, delimiter="\t\t", footer="\n")
 
 
 # plt.ylabel('E/delta')

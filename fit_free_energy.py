@@ -9,6 +9,14 @@ import scipy.optimize
 
 gap = 200e-6 * const.e
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('energy_file', help='file with free energy values')
+
+args = parser.parse_args()
+
+
 def open_3d_file(file):
     fh = open(file, 'r')
     header = fh.readline().rstrip()
@@ -22,7 +30,7 @@ def open_3d_file(file):
     return arrays, header
 
 
-data, header = open_3d_file('current-phase.txt')
+data, header = open_3d_file(args.energy_file)
 
 col_legends = header.split()[1:]
 col_dict = {}
