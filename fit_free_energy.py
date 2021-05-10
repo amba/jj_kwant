@@ -4,10 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.constants as const
 import io
-
+import json
 import scipy.optimize
 
-gap = 200e-6 * const.e
 
 import argparse
 
@@ -15,6 +14,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument('energy_file', help='file with free energy values')
 
 args = parser.parse_args()
+
+with open('args.json','r') as infile:
+    parameters = json.load(infile)
+
+print("simulation parameters:\n", parameters)
+
+gap = parameters['gap'] * const.e
 
 
 def open_3d_file(file):
