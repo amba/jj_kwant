@@ -175,6 +175,8 @@ for phi in phi_vals:
     np.savetxt(fh_free_energy, [[phi, free_energy]], fmt="%.10g", delimiter="\t\t")
     for ev in (evs):
         np.savetxt(fh_spectrum, [[phi, ev]], fmt="%.10g", delimiter="\t\t")
+
+    fh_spectrum.write("\n") # new block in datafile
     fh_free_energy.flush()
     fh_spectrum.flush()
     os.fsync(fh_free_energy)
