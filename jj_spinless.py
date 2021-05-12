@@ -85,9 +85,6 @@ fh_free_energy.write("# phi\t\tfree-energy\n")
 fh_spectrum = open(data_folder + '/spectrum.dat', 'w')
 fh_spectrum.write("# phi\t\tenergy\n")
 
-# np.savetxt(data_folder + '/current-phase.txt', data_block, fmt="%.17g",
-#            header=data_block_header, delimiter="\t\t", footer="\n")
-
 def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
               electrode_length = 3e-6, junction_length=100e-9,
               mu=0, disorder=0, gap=0, delta_phi=0):
@@ -102,10 +99,6 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
 
     syst = kwant.Builder()
 
-    #
-    # H_0
-    #
-    
     # On-site
     def onsite(site):
         (x, y) = site.pos
@@ -130,16 +123,13 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
     # Hoppings
     syst[lat.neighbors()] = -t * sigma_z
     
-    # # Need periodic boundaries x=L-1 <-> x = 0
-    # for j in range(W):
-    #     syst[lat(0,j), lat(L-1,j)] = -t * sigma_z
     def onsite_00(site):
         return np.abs(onsite(site)[0,0])
     def onsite_01(site):
         return np.abs(onsite(site)[1, 0])
     
     # kwant.plot(syst,site_color=onsite_00)
- #   kwant.plot(syst,site_color=onsite_01)
+    # kwant.plot(syst,site_color=onsite_01)
     
     return syst.finalized()
 
@@ -182,51 +172,3 @@ for phi in phi_vals:
     os.fsync(fh_free_energy)
     os.fsync(fh_spectrum)
     
-
-# free_energies = np.array(free_energies)
-# energies = np.array(energies)
-
-# current = 2 * const.e / const.hbar * np.gradient(free_energies)
-
-# current_modes = current * const.hbar / (const.e * gap)
-
-    
-# plt.grid()
-# plt.xlabel('phi/pi')
-# plt.plot(phi_vals/np.pi, energies/gap)
-# plt.savefig(data_folder + '/energies.pdf')
-
-# plt.clf()
-
-# plt.xlabel('phi/pi')
-# plt.grid()
-# plt.ylabel('current (mu A)')
-
-# plt.plot(phi_vals/np.pi, current*1e6, label="width = %g, junction_length = %g, delta = %.3g meV, fermi_energy = %.3g meV" % (width, junction_length, 1000 * gap / const.e, 1000 * mu / const.e))
-# plt.legend()
-# plt.savefig(data_folder + '/current-phase.pdf')
-
-# data_block = np.array([phi_vals, free_energies, current, current_modes]).T
-# data_block_header = "phi\t\tfree-energy\t\tcurrent\t\tmodes"
-# np.savetxt(data_folder + '/current-phase.txt', data_block, fmt="%.17g",
-#            header=data_block_header, delimiter="\t\t", footer="\n")
-
-
-# plt.ylabel('E/delta')
-# plt.legend()
-
-# plt.plot(phi_vals/np.pi, energies)
-# plt.show(block=False)
-# dense_ham = ham_mat.todense()
-
-# print(dense_ham.__class__, dense_ham.shape)
-# dense_ev = scipy.linalg.eigvalsh(dense_ham)
-
-# n_dense_ev = dense_ev.shape[0]
-# print(np.sort(dense_ev)[int(n_dense_ev/2-10):int(n_dense_ev/2 + 10)])
-
-# plt.plot(np.zeros((n_ev)), ev, 'x', markersize=1)
-# plt.grid()
-# plt.show(block=False)
-# import code
-# code.interact()
