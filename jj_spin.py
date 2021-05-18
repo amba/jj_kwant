@@ -31,7 +31,7 @@ parser.add_argument('--mass', help="effective mass / m_e(default: 0.03)", defaul
 parser.add_argument('--disorder', help="random disorder potential (in units of fermi energy E_F)", type=float, default=0)
 parser.add_argument('--gap', help="superconducting gap / eV (default: 200e-6)", default=200e-6, type=float)
 parser.add_argument('--by', help="in-plane magnetic field in y-direction (Tesla)", default=0, type=float)
-
+parser.add_argument('--rashba', help="rashba coefficient (meV nm)", default=0, type=float)
 
 
 parser.add_argument('--n-phi', help="number of values of phase difference (default: 20)", default=20, type=int)
@@ -51,6 +51,8 @@ junction_length = args.junction_length
 gap = args.gap * const.e
 
 B_y = args.by
+
+alpha_rashba = args.rashba * 1e-3 * const.e * 1e-9 # meV * nm
 
 n_s = args.carrier_density
 
@@ -80,7 +82,7 @@ bohr_magneton = 9.274009e-24 # J/T
 
 date_string = datetime.now()
 date_string = date_string.strftime("%Y-%m-%d_%H-%M-%S")
-data_folder = date_string + "_JJ_spin_width=%g_junction_length=%g_electrode_length=%g_By=%g_disorder=%g" % (width, junction_length, electrode_length, args.by, args.disorder)
+data_folder = date_string + "_JJ_spin_width=%g_junction_length=%g_electrode_length=%g_By=%g_rashba=%g_disorder=%g" % (width, junction_length, electrode_length, args.by, args.rashba, args.disorder)
 
 print("data folder: ", data_folder)
 pathlib.Path(data_folder).mkdir()
@@ -145,13 +147,15 @@ def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
     # Hoppings
 
     # Rashba term in hamiltonian: -iα(∂_x σ_y - ∂_y σ_x)
+
+    # fehlt 1/a ??
     
     # x direction
     syst[kwant.builder.HoppingKind((1, 0), lat, lat)] = \
-        np.kron(tau_z, -t * sigma_0 + 1j * alpha_rashba * sigma_y / 2)
+        np.kron(tau_z, -t * sigma_0 + 1j * 1/a * alpha_rashba * sigma_y / 2)
     # y direction
     syst[kwant.builder.HoppingKind((0, 1), lat, lat)] = \
-        np.kron(tau_z, -t * sigma_0 - 1j * alpha_rashba * sigma_x / 2)
+        np.kron(tau_z, -t * sigma_0 - 1j * 1/a * alpha_rashba * sigma_x / 2)
     
     
     
@@ -176,14 +180,14 @@ print("E_fermi = %.3g meV, lambda_fermi = %.3g nm, N0 = %.2g" % (1000 * mu / con
 
 
 
-phi_vals = np.linspace(-0.2*np.pi, 1.2*np.pi, n_phi)
+phi_vals = np.linspace(-1.2*np.pi, 1.2*np.pi, n_phi)
 
 for phi in phi_vals:
     print("phi = %.3g pi" % (phi/np.pi))
     print("make syst")
     t0 = time.time()
 
-    ham_mat = make_hamiltonian_sparse_csc(a=5e-9, width=width, electrode_length=electrode_length, junction_length=junction_length, mu=mu, gap=gap, delta_phi=phi, disorder=args.disorder, B=[0, B_y, 0])
+    ham_mat = make_hamiltonian_sparse_csc(a=5e-9, width=width, electrode_length=electrode_length, junction_length=junction_length, mu=mu, gap=gap, delta_phi=phi, disorder=args.disorder, B=[0, B_y, 0], alpha_rashba=alpha_rashba)
     t1 = time.time()
     print("time for make_hamiltonian: ", t1 - t0)
 
