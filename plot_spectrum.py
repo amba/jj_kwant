@@ -40,7 +40,7 @@ phi_vals = data[:,0,0]
 ev_data = data[:,:,1] / gap
 print(ev_data.shape)
 
-plt.plot(phi_vals / np.pi, ev_data, '.', cmap='grey')
+plt.plot(phi_vals / np.pi, ev_data, '.')
 plt.xlabel('φ / π')
 plt.ylabel('ε / Δ')
 plt.grid()
