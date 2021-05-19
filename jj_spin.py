@@ -191,7 +191,7 @@ for phi in phi_vals:
     t1 = time.time()
     print("time for make_hamiltonian: ", t1 - t0)
 
-    k= int(2 * n_bound_states + 6)     # factor 2 for spin
+    k= int(4 * n_bound_states)     
 
     print("calculating %d eigenvalues" % k)
     evs = scipy.sparse.linalg.eigsh(ham_mat, k=k, sigma=0, which='LA', return_eigenvectors=False, tol=tolerance)
