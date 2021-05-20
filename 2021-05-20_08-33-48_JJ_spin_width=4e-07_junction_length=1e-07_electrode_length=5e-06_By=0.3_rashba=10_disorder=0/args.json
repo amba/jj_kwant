@@ -1,0 +1,1 @@
+{"lattice_constant": 5e-09, "width": 4e-07, "junction_length": 1e-07, "electrode_length": 5e-06, "carrier_density": 1e+16, "mass": 0.03, "disorder": 0, "gap": 0.0002, "by": 0.3, "rashba": 10.0, "n_phi": 51, "tol": 0.001}
