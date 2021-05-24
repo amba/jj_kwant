@@ -54,7 +54,8 @@ def _make_syst_jj_2d(
         alpha_rashba=0,
         B=[0,0,0],
         g_factor=-10,
-        debug=False
+        debug=False,
+        salt=''
 ):
     
     t = const_hbar**2 / (2 * m * a**2)
@@ -76,7 +77,7 @@ def _make_syst_jj_2d(
         
         h0 = 4*t - mu
         if (disorder > 1e-9):
-            h0 = h0 + disorder * mu * (kwant.digest.uniform(site.pos) - 0.5)
+            h0 = h0 + disorder  * (kwant.digest.uniform(site.pos, salt=salt) - 0.5)
             
         dphi = delta_phi
         
@@ -128,13 +129,15 @@ def _make_syst_jj_1d(
         electrode_length = 3e-6,
         junction_length=100e-9,
         mu=None,
-        disorder=0,
         gap=None,
         delta_phi=None,
         alpha_rashba=0,
         B=[0,0,0],
         g_factor=-10,
-        debug=False
+        debug=False,
+        disorder=0,
+        gap_disorder=0,
+        salt='',
 ):
     
     t = const_hbar**2 / (2 * m * a**2)
@@ -154,8 +157,7 @@ def _make_syst_jj_1d(
         # p^2 / (2m) - μ + U(r)
         
         h0 = 2*t - mu # 1D wire: 2t, not 4t
-        if (disorder > 1e-9):
-            h0 = h0 + disorder * mu * (kwant.digest.uniform(site.pos) - 0.5)
+        h0 = h0 + disorder * (kwant.digest.uniform(site.pos, salt=salt) - 0.5)
             
         dphi = delta_phi
         
@@ -164,8 +166,9 @@ def _make_syst_jj_1d(
 
         start_junction = int((L - L_junction) / 2)
         pairing = 0
+        real_gap = gap + gap_disorder * (kwant.digest.uniform(site.pos, salt=salt) - 0.5)
         if x < start_junction or x >= start_junction + L_junction:
-            pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
+            pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), real_gap * sigma_0)
             
         
         # from "a josephson supercurrent diode" paper supplement
