@@ -41,7 +41,7 @@ tau_z = tinyarray.array([[1, 0], [0,-1]])
 ###############################
 
 # internal function
-def _make_syst(
+def _make_syst_jj_2d(
         m = 0.03 * const_m_e,
         a=5e-9,
         width=3e-6,
@@ -121,15 +121,98 @@ def _make_syst(
     
     return syst.finalized()
 
+# internal function
+def _make_syst_jj_1d(
+        m = 0.03 * const_m_e,
+        a=5e-9,
+        electrode_length = 3e-6,
+        junction_length=100e-9,
+        mu=None,
+        disorder=0,
+        gap=None,
+        delta_phi=None,
+        alpha_rashba=0,
+        B=[0,0,0],
+        g_factor=-10,
+        debug=False
+):
+    
+    t = const_hbar**2 / (2 * m * a**2)
+    print("m = %g, a = %g, electrode_length = %g, junction_length = %g, t = %g" % (m, a, electrode_length, junction_length, t))
+    L = int((2*electrode_length + junction_length) / a)
+    L_junction = int(junction_length/a)
+    print("L = %d, L_junction = %d" % (L, L_junction))
+    lat = kwant.lattice.chain(1)
+    
+
+    syst = kwant.Builder()
+
+    # On-site
+    def onsite(site):
+        (x,) = site.pos
+
+        # p^2 / (2m) - μ + U(r)
+        
+        h0 = 2*t - mu # 1D wire: 2t, not 4t
+        if (disorder > 1e-9):
+            h0 = h0 + disorder * mu * (kwant.digest.uniform(site.pos) - 0.5)
+            
+        dphi = delta_phi
+        
+        if x > L/2:
+            dphi = -dphi
+
+        start_junction = int((L - L_junction) / 2)
+        pairing = 0
+        if x < start_junction or x >= start_junction + L_junction:
+            pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
+            
+        
+        # from "a josephson supercurrent diode" paper supplement
+        zeeman = 0.5 * g_factor * const_bohr_magneton * (B[0] * sigma_x + B[1] * sigma_y + B[2] * sigma_z)
+        
+        return np.kron(tau_z, h0 * sigma_0) + np.kron(tau_0, zeeman) + pairing
+    
+    syst[(lat(x) for x in range(L))] = onsite
+
+    
+    # Hoppings
+
+    # Rashba term in hamiltonian: -iα(∂_x σ_y - ∂_y σ_x)
+
+    # x direction
+    syst[kwant.builder.HoppingKind((1,), lat, lat)] = \
+        np.kron(tau_z, -t * sigma_0 + 1j * 1/a * alpha_rashba * sigma_y / 2)
+    
+    # debug functions
+
+    def onsite_0000(site):
+        return np.abs(onsite(site)[0,0,0,0])
+    def onsite_01(site):
+        return np.abs(onsite(site)[1, 0])
+
+    if debug:
+        kwant.plot(syst,site_color=onsite_00)
+        kwant.plot(syst,site_color=onsite_01)
+    
+    return syst.finalized()
+
 # API function
-def hamiltonian_sparse_csc(timing=True, *args, **kwargs):
+
+def _hamiltonian(func, timing=True, *args, **kwargs):
     t1 = time.time()
-    syst = _make_syst(*args, **kwargs)
+    syst = func(*args, **kwargs)
     ham_mat = syst.hamiltonian_submatrix(sparse=True)
     print("Hamiltonian shape: ", ham_mat.shape)
     ham_mat = ham_mat.tocsc()
     print("time to generate hamiltonian: %.2f s" % (time.time() - t1))
     return ham_mat
+
+def hamiltonian_jj_2d(timing=True, *args, **kwargs):
+    return _hamiltonian(func=_make_syst_jj_2d, *args, **kwargs)
+
+def hamiltonian_jj_1d(timing=True, *args, **kwargs):
+    return _hamiltonian(func=_make_syst_jj_1d, *args, **kwargs)
 
 
 

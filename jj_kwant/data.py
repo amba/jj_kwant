@@ -13,7 +13,8 @@ class datafile:
             params = [],
             folder : str = "",
             number_format = '%.10g',
-            number_delimiter = "\t\t"
+            number_delimiter = "\t\t",
+            args={}
     ):
         self.number_format = number_format
         self.number_delimiter = number_delimiter
@@ -47,10 +48,9 @@ class datafile:
         
         # generate metadata file
         # copy script args into metadata
-        # date/time etc.
 
-        # with open(data_folder + '/args.json', 'w') as outfile:
-        #     json.dump(vars(args), outfile)
+        with open(data_folder + '/args.json', 'w') as outfile:
+            json.dump(args, outfile)
         
         
     def log(self, evs, params={}):
