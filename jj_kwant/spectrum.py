@@ -77,7 +77,8 @@ def _make_syst_jj_2d(
         
         h0 = 4*t - mu
         if (disorder > 1e-9):
-            h0 = h0 + disorder  * (kwant.digest.uniform(site.pos, salt=salt) - 0.5)
+            # variance of h0 is disorder
+            h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
             
         dphi = delta_phi
         
@@ -157,7 +158,7 @@ def _make_syst_jj_1d(
         # p^2 / (2m) - μ + U(r)
         
         h0 = 2*t - mu # 1D wire: 2t, not 4t
-        h0 = h0 + disorder * (kwant.digest.uniform(site.pos, salt=salt) - 0.5)
+        h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
             
         dphi = delta_phi
         
@@ -166,7 +167,7 @@ def _make_syst_jj_1d(
 
         start_junction = int((L - L_junction) / 2)
         pairing = 0
-        real_gap = gap + gap_disorder * (kwant.digest.uniform(site.pos, salt=salt) - 0.5)
+        real_gap = gap + gap_disorder * kwant.digest.gauss(site.pos, salt=salt)
         if x < start_junction or x >= start_junction + L_junction:
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), real_gap * sigma_0)
             
