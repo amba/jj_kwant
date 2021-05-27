@@ -21,12 +21,13 @@ args = {
     'disorder': 0 * const.e,
     'gap_disorder':  0 * const.e,
     'a': 5e-9,
+    'phi': np.pi,
     }
 
 
 data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'B', 'disorder'], args=args)
 
-phi = 0
+
 disorder = args['disorder']
 
 for B in np.linspace(0,1.6,100):
@@ -41,10 +42,10 @@ for B in np.linspace(0,1.6,100):
         electrode_length=args['electrode_length'],
         disorder = args['disorder'],     
         B = [0, B, 0],
-        delta_phi = phi,
+        delta_phi = args['phi'],
     );
  
-    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 30)
+    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
 
     data_file.log(evs, {'phi': phi, 'B': B, 'disorder': disorder})
 
