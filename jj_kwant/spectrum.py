@@ -76,9 +76,8 @@ def _make_syst_jj_2d(
         # p^2 / (2m) - μ + U(r)
         
         h0 = 4*t - mu
-        if (disorder > 1e-9):
-            # variance of h0 is disorder
-            h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
+        # variance of h0 is disorder
+        h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
             
         dphi = delta_phi
         
