@@ -13,8 +13,8 @@ gap = 100e-6 * const.e
 args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
-    'mu': 5e-3 * const.e,
-    'rashba': 20e-3 * const.e * 1e-9, # 20 meV nm
+    'mu': 100e-3 * const.e,
+    'rashba': 10e-3 * const.e * 1e-9, # 20 meV nm
     'width': 4e-6,
     'junction_length': 100e-9,
     'electrode_length': 400e-9,
