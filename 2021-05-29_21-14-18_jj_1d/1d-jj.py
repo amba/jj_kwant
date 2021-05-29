@@ -14,7 +14,7 @@ args = {
     'gap': gap,
     'mu': mu,
     'rashba': 10e-3 * const.e * 1e-9, # 50 meV nm = 0.5 eV A
-    'electrode_length': 12e-6,
+    'electrode_length': 15e-6,
     'junction_length': 100e-9,
     'a': 5e-9,
     'g': -10
@@ -29,7 +29,7 @@ B = 0.3
 n = 0
 ky = 1/const.hbar * np.sqrt(2 * mass * mu)
 for phi in np.linspace(0, np.pi, 10):
-    for ky in np.linspace(-1.1*ky, 1.1*ky, 51):
+    for ky in np.linspace(-1.1*ky, 1.1*ky, 201):
         print("n: ", n)
         n = n + 1
         ham = jj_kwant.spectrum.hamiltonian_jj_1d(
