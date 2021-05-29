@@ -137,6 +137,7 @@ def _make_syst_jj_1d(
         debug=False,
         disorder=0,
         gap_disorder=0,
+        ky=0,
         salt='',
 ):
     
@@ -156,7 +157,8 @@ def _make_syst_jj_1d(
 
         # p^2 / (2m) - μ + U(r)
         
-        h0 = 2*t - mu # 1D wire: 2t, not 4t
+        h0 = const_hbar**2 * ky**2 / (2*m) + \
+            2*t - mu # 1D wire: 2t, not 4t
         h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
             
         dphi = delta_phi
@@ -173,8 +175,9 @@ def _make_syst_jj_1d(
         
         # from "a josephson supercurrent diode" paper supplement
         zeeman = 0.5 * g_factor * const_bohr_magneton * (B[0] * sigma_x + B[1] * sigma_y + B[2] * sigma_z)
-        
-        return np.kron(tau_z, h0 * sigma_0) + np.kron(tau_0, zeeman) + pairing
+
+        h0 = h0 * sigma_0 - alpha_rashba * ky * sigma_x
+        return np.kron(tau_z, h0) + np.kron(tau_0, zeeman) + pairing
     
     syst[(lat(x) for x in range(L))] = onsite
 
