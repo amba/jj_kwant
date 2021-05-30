@@ -55,6 +55,9 @@ def _make_syst_jj_2d(
         B=[0,0,0],
         g_factor=-10,
         debug=False,
+        # periodic onsite potential modulation in gap
+        modulation_amplitude=0,
+        modulation_length = 20e-9,
         salt=''
 ):
     
@@ -87,7 +90,12 @@ def _make_syst_jj_2d(
         start_junction = int((L - L_junction) / 2)
         pairing = 0
         if x < start_junction or x >= start_junction + L_junction:
+            # in electrodes
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
+        else:
+            # in junction
+            h0 = h0 + modulation_amplitude * np.sin(2*np.pi * y * a / modulation_length)
+        
             
         
         # from "a josephson supercurrent diode" paper supplement
@@ -111,10 +119,11 @@ def _make_syst_jj_2d(
     
     # debug functions
 
-    def onsite_0000(site):
-        return np.abs(onsite(site)[0,0,0,0])
+    def onsite_00(site):
+        # onsite electron
+        return np.abs(onsite(site)[0,0])
     def onsite_01(site):
-        return np.abs(onsite(site)[1, 0])
+        return np.abs(onsite(site)[2, 0])
 
     if debug:
         kwant.plot(syst,site_color=onsite_00)
@@ -192,8 +201,8 @@ def _make_syst_jj_1d(
     
     # debug functions
 
-    def onsite_0000(site):
-        return np.abs(onsite(site)[0,0,0,0])
+    def onsite_00(site):
+        return np.abs(onsite(site)[0,0])
     def onsite_01(site):
         return np.abs(onsite(site)[1, 0])
 

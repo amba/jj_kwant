@@ -9,29 +9,30 @@ import time
 
 gap = 100e-6 * const.e
 
+rashba = 20e-3 * const.e * 1e-9 # 20 meV nm
+mu = 100e-3 * const.e
 
 args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
-    'mu': 100e-3 * const.e,
-    'rashba': 10e-3 * const.e * 1e-9, # 20 meV nm
+    'mu': mu,
+    'rashba': rashba,
     'width': 4e-6,
     'junction_length': 100e-9,
     'electrode_length': 600e-9,
-#    'disorder': 0 * const.e,
-    'gap_disorder':  0 * const.e,
     'a': 5e-9,
     'phi': np.pi,
     }
 
 
-data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'B', 'disorder'], args=args)
+data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['mod_amp', 'mod_length', 'phi', 'B'], args=args)
 
+modulation_length = 200e-9
 
-disorder = 200e-3 * const.e
-for disorder in np.linspace(0, disorder, 200):
+for modulation_amplitude in np.linspace(0.1*mu, mu, 20):
 #for B in np.linspace(0,1.6,200):
-    B = 1
+    print("mod_amp / μ = ", modulation_amplitude / mu)
+    B = 0.2
     phi = args['phi']
     ham = jj_kwant.spectrum.hamiltonian_jj_2d(
         a = args['a'],
@@ -42,16 +43,17 @@ for disorder in np.linspace(0, disorder, 200):
         width = args['width'],
         junction_length=args['junction_length'],
         electrode_length=args['electrode_length'],
-        disorder = disorder,     
         B = [0, B, 0],
         delta_phi = phi,
+        modulation_amplitude = modulation_amplitude,
+        modulation_length = modulation_length,
+#        debug=True
     );
  
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 2)
-    print("evs: ", evs)
     
 
-    data_file.log(evs, {'phi': phi, 'B': B, 'disorder': disorder})
+    data_file.log(evs, {'mod_amp': modulation_amplitude, 'mod_length': modulation_length, 'phi': phi, 'B': B})
 
     
 
