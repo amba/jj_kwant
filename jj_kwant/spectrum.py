@@ -54,10 +54,9 @@ def _make_syst_jj_2d(
         alpha_rashba=0,
         B=[0,0,0],
         g_factor=-10,
+        junction_island_width=0,
+        junction_island_spacing=100e-9,
         debug=False,
-        # periodic onsite potential modulation in gap
-        modulation_amplitude=0,
-        modulation_length = 20e-9,
         salt=''
 ):
     
@@ -94,7 +93,10 @@ def _make_syst_jj_2d(
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
         else:
             # in junction
-            h0 = h0 + modulation_amplitude * np.sin(2*np.pi * y * a / modulation_length)
+           mod = (y*a) % junction_island_spacing
+           if mod < junction_island_width and\
+              abs((x-L/2)*a) < junction_island_width/2:
+               pairing = np.kron(tau_x, gap*sigma_0)
         
             
         
@@ -151,6 +153,7 @@ def _make_syst_jj_1d(
 ):
     
     t = const_hbar**2 / (2 * m * a**2)
+    print("phi / π = %g" % (delta_phi / np.pi))
     print("m = %g, a = %g, electrode_length = %g, junction_length = %g, t = %g" % (m, a, electrode_length, junction_length, t))
     L = int((2*electrode_length + junction_length) / a)
     L_junction = int(junction_length/a)
