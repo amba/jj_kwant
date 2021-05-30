@@ -14,7 +14,7 @@ args = {
     'gap': gap,
     'mu': mu,
     'rashba': 20e-3 * const.e * 1e-9, # 50 meV nm = 0.5 eV A
-    'electrode_length': 10e-6,
+    'electrode_length': 15e-6,
     'junction_length': 100e-9,
     'a': 1e-9,
     'g': -10
@@ -25,16 +25,15 @@ data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'phi', 'B', 'mu
 
 
 mu = args['mu']
-B = 0.3
 n = 0
-m = 0
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 phi = np.pi
-for B in np.linspace(0, 0.5, 10):
+for B in np.linspace(0, 2, 100):
     print("\n\n--------------------------")
-    print("B = %.2g" % B)
-    for ky in np.linspace(-1.05*k_fermi, -0.8*k_fermi, 30):
+    n = 0
+    for ky in np.linspace(-1.05*k_fermi, -0.9*k_fermi, 1000):
         print("n: ", n)
+        print("B = %.2g" % B)
         n = n + 1
         ham = jj_kwant.spectrum.hamiltonian_jj_1d(
             ky=ky,
