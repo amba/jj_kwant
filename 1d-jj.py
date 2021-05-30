@@ -27,9 +27,12 @@ data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'phi', 'B', 'mu
 mu = args['mu']
 B = 0.3
 n = 0
+m = 0
 ky = 1/const.hbar * np.sqrt(2 * mass * mu)
 phi = np.pi
 for B in np.linspace(0, 0.5, 10):
+    print("\n\n--------------------------")
+    print("B = %.2g", B)
     for ky in np.linspace(-1.05*ky, -0.8*ky, 30):
         print("n: ", n)
         n = n + 1
