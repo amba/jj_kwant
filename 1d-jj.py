@@ -28,12 +28,12 @@ mu = args['mu']
 B = 0.3
 n = 0
 m = 0
-ky = 1/const.hbar * np.sqrt(2 * mass * mu)
+k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 phi = np.pi
 for B in np.linspace(0, 0.5, 10):
     print("\n\n--------------------------")
-    print("B = %.2g", B)
-    for ky in np.linspace(-1.05*ky, -0.8*ky, 30):
+1    print("B = %.2g" % B)
+    for ky in np.linspace(-1.05*k_fermi, -0.8*k_fermi, 30):
         print("n: ", n)
         n = n + 1
         ham = jj_kwant.spectrum.hamiltonian_jj_1d(
