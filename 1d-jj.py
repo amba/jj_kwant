@@ -14,9 +14,9 @@ args = {
     'gap': gap,
     'mu': mu,
     'rashba': 20e-3 * const.e * 1e-9, # 50 meV nm = 0.5 eV A
-    'electrode_length': 20e-6,
+    'electrode_length': 10e-6,
     'junction_length': 100e-9,
-    'a': 5e-9,
+    'a': 1e-9,
     'g': -10
     }
 
@@ -28,8 +28,9 @@ mu = args['mu']
 B = 0.3
 n = 0
 ky = 1/const.hbar * np.sqrt(2 * mass * mu)
-for phi in np.linspace(0, np.pi, 10):
-    for ky in np.linspace(-1.1*ky, 1.1*ky, 1001):
+phi = np.pi
+for B in np.linspace(0, 0.5, 10):
+    for ky in np.linspace(-1.05*ky, -0.8*ky, 30):
         print("n: ", n)
         n = n + 1
         ham = jj_kwant.spectrum.hamiltonian_jj_1d(
@@ -46,7 +47,7 @@ for phi in np.linspace(0, np.pi, 10):
             alpha_rashba=args['rashba'],
             salt='')
     
-        evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
+        evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
     
         data_file.log(evs, {'ky': ky, 'phi': phi, 'B': B, 'mu': mu})
 
