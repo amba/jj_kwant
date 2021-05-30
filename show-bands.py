@@ -30,34 +30,43 @@ m = 0.03 * const_m_e
 μ = 100e-3 * const_e
 g = -10
 alpha = 20e-3 * const_e * 1e-9 # 10 meV nm
-B_x = 1
 
-k_max = 1 / const_hbar * np.sqrt(2 * m * μ)
-print("lambda_min = %.2g" % (2*np.pi / k_max))
+kf_p = -m * alpha /( const_hbar**2) \
+    + 1/const_hbar * np.sqrt(m**2 * alpha**2 /const_hbar**2 + 2 * m * μ)
 
-kyvals = np.linspace(-k_max, k_max, 10000)
+kf_m = -m * alpha / (const_hbar**2) \
+    - 1/const_hbar * np.sqrt(m**2 * alpha**2 / const_hbar**2 + 2 * m * μ)
 
-kxvals = np.linspace(-0.5 * k_max, 0.5*k_max, 5)
-for kx in kxvals:
-    evals_p = []
-    evals_m = []
-    for ky in (kyvals):
-        H = H_rashba(kx=kx, ky=ky,m=m, μ=μ, alpha=alpha, g=g, B=[B_x,0,0])
-        evals = scipy.linalg.eigvalsh(H)
-        evals_p.append(evals[0])
-        evals_m.append(evals[1])
+print("kf-: %.5g, kf+: %.5g" % (kf_m, kf_p))
+
+# #B_x = 1
+
+# k_max = 1 / const_hbar * np.sqrt(2 * m * μ)
+# print("lambda_min = %.2g" % (2*np.pi / k_max))
+
+# kyvals = np.linspace(-k_max, k_max, 10000)
+
+# kxvals = np.linspace(-0.5 * k_max, 0.5*k_max, 5)
+# for kx in kxvals:
+#     evals_p = []
+#     evals_m = []
+#     for ky in (kyvals):
+#         H = H_rashba(kx=kx, ky=ky,m=m, μ=μ, alpha=alpha, g=g, B=[B_x,0,0])
+#         evals = scipy.linalg.eigvalsh(H)
+#         evals_p.append(evals[0])
+#         evals_m.append(evals[1])
     
-    evals_p = np.array(evals_p)
-    evals_m = np.array(evals_m)
+#     evals_p = np.array(evals_p)
+#     evals_m = np.array(evals_m)
     
-    plt.plot(kyvals*1e-9, evals_p / const_e * 1e3, label="kx=%.2g" % kx)
-    plt.plot(kyvals*1e-9, evals_m / const_e * 1e3)
-plt.ylabel('E (meV)')
-plt.xlabel('k (1/nm)')
-plt.grid()
+#     plt.plot(kyvals*1e-9, evals_p / const_e * 1e3, label="kx=%.2g" % kx)
+#     plt.plot(kyvals*1e-9, evals_m / const_e * 1e3)
+# plt.ylabel('E (meV)')
+# plt.xlabel('k (1/nm)')
+# plt.grid()
 
 
 
-plt.show(block=False)
-import code
-code.interact()
+# plt.show(block=False)
+# import code
+# code.interact()
