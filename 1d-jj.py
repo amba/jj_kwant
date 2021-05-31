@@ -14,14 +14,14 @@ args = {
     'gap': gap,
     'electrode_length': 15e-6,
     'junction_length': 100e-9,
-    'a': 5e-9,
+    'a': 1e-9,
     'g': -10
     }
 
 data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'alpha', 'phi', 'B', 'mu'], args=args)
 
 
-mu_max = 100e-3 * const.e
+mu_max = 10e-3 * const.e
 phi = np.pi
 B = 0.2
 #mu = 0.5 * mu_max
@@ -36,7 +36,7 @@ for mu in np.linspace(0, mu_max, 100):
     print("kf_m: %g" % kf_m)
     print("kf_p: %g" % (-kf_p))
     n = 0
-    for ky in np.linspace(1.1*kf_m, -0.9*kf_p, 1000):
+    for ky in np.linspace(1.1*kf_m, 0, 1000):
         print("n: ", n)
         print("mu = %.2g meV" % (mu * 1e3 / const.e))
         n = n + 1
