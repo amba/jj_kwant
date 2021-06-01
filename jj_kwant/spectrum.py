@@ -48,6 +48,7 @@ def _make_syst_jj_2d(
         electrode_length = 3e-6,
         junction_length=100e-9,
         mu=None,
+        gap_potential=0,
         disorder=0,
         gap=None,
         delta_phi=None,
@@ -91,8 +92,9 @@ def _make_syst_jj_2d(
         if x < start_junction or x >= start_junction + L_junction:
             # in electrodes
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
-        # else:
-        #     # in junction
+        else:
+            # in junction
+            h0 = h0 + gap_potential
         #    mod = (y*a) % junction_island_spacing
         #    if mod < junction_island_width and\
         #       abs((x-L/2)*a) < junction_island_width/2:
@@ -140,6 +142,7 @@ def _make_syst_jj_1d(
         electrode_length = 3e-6,
         junction_length=100e-9,
         mu=None,
+        gap_potential=0,
         gap=None,
         delta_phi=None,
         alpha_rashba=0,
@@ -183,7 +186,8 @@ def _make_syst_jj_1d(
         real_gap = gap + gap_disorder * kwant.digest.gauss(site.pos, salt=salt)
         if x < start_junction or x >= start_junction + L_junction:
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), real_gap * sigma_0)
-            
+        else:
+            h0 = h0 + gap_potential
         
         # from "a josephson supercurrent diode" paper supplement
         zeeman = 0.5 * g_factor * const_bohr_magneton * (B[0] * sigma_x + B[1] * sigma_y + B[2] * sigma_z)

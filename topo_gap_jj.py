@@ -10,7 +10,7 @@ import time
 gap = 100e-6 * const.e
 
 rashba = 20e-3 * const.e * 1e-9 # 20 meV nm
-mu = 0.5e-3 * const.e # 0.5 meV 
+mu = 100e-3 * const.e # 100 meV 
 #junction_island_width = 50e-9
 #junction_island_spacing = 100e-9
 args = {
@@ -22,18 +22,20 @@ args = {
     'junction_length': 100e-9,
     'electrode_length': 600e-9,
     'a': 5e-9,
-    'phi': np.pi,
     
     }
 
 
-data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'B'], args=args)
-
-for B in np.linspace(0,1,200):
-    phi = args['phi']
+data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B'], args=args)
+phi = np.pi
+B = 0.2
+for potential in np.linspace(0, mu, 100):
+    print("-----------------------")
+    print("potential / mu = ", potential / mu)
     ham = jj_kwant.spectrum.hamiltonian_jj_2d(
         a = args['a'],
         m = args['mass'],
+        gap_potential = potential,
         mu = args['mu'],
         gap = args['gap'],
         alpha_rashba = args['rashba'],
@@ -42,15 +44,15 @@ for B in np.linspace(0,1,200):
         electrode_length=args['electrode_length'],
         B = [0, B, 0],
         delta_phi = phi,
-        #junction_island_width = junction_island_width,
-        #junction_island_spacing = junction_island_spacing,
-        # debug=True
+            #junction_island_width = junction_island_width,
+            #junction_island_spacing = junction_island_spacing,
+            # debug=True
     );
- 
+     
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 5)
+        
     
-
-    data_file.log(evs, {'phi': phi, 'B': B})
+    data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B})
 
     
 
