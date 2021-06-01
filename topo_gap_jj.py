@@ -10,17 +10,17 @@ import time
 gap = 100e-6 * const.e
 
 rashba = 20e-3 * const.e * 1e-9 # 20 meV nm
-mu = 100e-3 * const.e
-junction_island_width = 50e-9
-junction_island_spacing = 100e-9
+mu = 0.5e-3 * const.e # 0.5 meV 
+#junction_island_width = 50e-9
+#junction_island_spacing = 100e-9
 args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
     'mu': mu,
     'rashba': rashba,
-    'width': 4e-6,
+    'width': 3e-6,
     'junction_length': 100e-9,
-    'electrode_length': 600e-9,
+    'electrode_length': 1e-6,
     'a': 5e-9,
     'phi': np.pi,
     
@@ -42,8 +42,8 @@ for B in np.linspace(0,1,200):
         electrode_length=args['electrode_length'],
         B = [0, B, 0],
         delta_phi = phi,
-        junction_island_width = junction_island_width,
-        junction_island_spacing = junction_island_spacing,
+        #junction_island_width = junction_island_width,
+        #junction_island_spacing = junction_island_spacing,
         # debug=True
     );
  

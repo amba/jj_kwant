@@ -54,8 +54,8 @@ def _make_syst_jj_2d(
         alpha_rashba=0,
         B=[0,0,0],
         g_factor=-10,
-        junction_island_width=0,
-        junction_island_spacing=100e-9,
+        # junction_island_width=0,
+        # junction_island_spacing=100e-9,
         debug=False,
         salt=''
 ):
@@ -91,12 +91,12 @@ def _make_syst_jj_2d(
         if x < start_junction or x >= start_junction + L_junction:
             # in electrodes
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
-        else:
-            # in junction
-           mod = (y*a) % junction_island_spacing
-           if mod < junction_island_width and\
-              abs((x-L/2)*a) < junction_island_width/2:
-               pairing = np.kron(tau_x, gap*sigma_0)
+        # else:
+        #     # in junction
+        #    mod = (y*a) % junction_island_spacing
+        #    if mod < junction_island_width and\
+        #       abs((x-L/2)*a) < junction_island_width/2:
+        #        pairing = np.kron(tau_x, gap*sigma_0)
         
             
         
