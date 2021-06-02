@@ -8,17 +8,16 @@ import time
 
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
-alpha_max = 50e-3 * const.e * 1e-9 # 50 meV nm = 0.5 eV A
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 10e-6,
+    'electrode_length': 12e-6,
     'junction_length': 100e-9,
     'a': 5e-9,
     'g': -10
     }
 
-data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'alpha', 'phi', 'B', 'mu', 'potential'], args=args)
+data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'disorder' ], args=args)
 
 
 mu = 100e-3 * const.e
@@ -26,9 +25,10 @@ mu = 100e-3 * const.e
 phi = np.pi
 B = 0.2
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
+potential = 0.1 * mu
 
-for potential in np.linspace(0, 1.5* mu, 100):
-    print("potential / mu: ", potential / mu)
+for disorder in np.linspace(0, 0.05 * mu, 100):
+    print("disorder / mu: ", disorder / mu)
     kf_m = -mass * alpha / const.hbar**2 - \
         1/const.hbar * np.sqrt(mass**2 * alpha**2 / const.hbar**2 + 2 * mass * mu)
     kf_p = -mass * alpha / const.hbar**2 + \
@@ -38,6 +38,7 @@ for potential in np.linspace(0, 1.5* mu, 100):
     print("kf_p: %g" % (-kf_p))
     n = 0
     for ky in np.linspace(1.1*kf_m, 0, 2000):
+        salt = str(time.time()) # new disorder for each disorder strength
         print("n: ", n)
         print("mu = %.2g meV" % (mu * 1e3 / const.e))
         n = n + 1
@@ -51,14 +52,15 @@ for potential in np.linspace(0, 1.5* mu, 100):
             B=[0,B,0],
             delta_phi = phi,
             g_factor=args['g'],
+            disorder=disorder,
             gap_potential = potential,
             mu=mu,
             alpha_rashba=alpha,
-            salt='')
+            salt=salt)
     
         evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
     
-        data_file.log(evs, {'ky': ky, 'phi': phi, 'B': B, 'mu': mu, 'alpha': alpha, 'potential': potential})
+        data_file.log(evs, {'ky': ky, 'disorder': disorder})
 
 
 

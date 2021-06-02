@@ -38,7 +38,8 @@ kf_m = -m * alpha / (const_hbar**2) \
     - 1/const_hbar * np.sqrt(m**2 * alpha**2 / const_hbar**2 + 2 * m * μ)
 
 print("kf-: %.5g, kf+: %.5g" % (kf_m, kf_p))
-
+print("k * alpha = %.4g meV" % (kf_m * alpha / const_e * 1e3))
+print("E_z = g μ_B / T = %.4g meV / T" % (g * const_bohr_magneton / const_e * 1e3))
 # #B_x = 1
 
 # k_max = 1 / const_hbar * np.sqrt(2 * m * μ)
