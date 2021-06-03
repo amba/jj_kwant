@@ -13,7 +13,7 @@ args = {
     'gap': gap,
     'electrode_length': 4e-6,
     'junction_length': 100e-9,
-    'a': 5e-9,
+    'a': 1e-9,
     'g': -10
     }
 
@@ -27,6 +27,7 @@ B_max = 1
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
 potential = 0.5 * mu
 disorder = 0
+
 for B in np.linspace(0, B_max, 100):
     print("B: ", B)
     print("disorder / mu: ", disorder / mu)
@@ -44,7 +45,7 @@ for B in np.linspace(0, B_max, 100):
         print("mu = %.2g meV" % (mu * 1e3 / const.e))
         n = n + 1
         ham = jj_kwant.spectrum.hamiltonian_jj_1d(
-#            debug=True,
+            debug=True,
             ky=ky,
             a=args['a'],
             m=mass,
@@ -56,7 +57,7 @@ for B in np.linspace(0, B_max, 100):
             g_factor=args['g'],
             disorder=disorder,
             gap_potential = potential,
-            gap_potential_cosine_shape=True,
+            gap_potential_shape='cosine',
             mu=mu,
             alpha_rashba=alpha,
             salt=salt)

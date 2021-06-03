@@ -143,7 +143,7 @@ def _make_syst_jj_1d(
         junction_length=100e-9,
         mu=None,
         gap_potential=0,
-        gap_potential_cosine_shape=False,
+        gap_potential_shape=None,
         gap=None,
         delta_phi=None,
         alpha_rashba=0,
@@ -188,8 +188,10 @@ def _make_syst_jj_1d(
         if x < start_junction or x >= start_junction + L_junction:
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), real_gap * sigma_0)
         else:
-            if gap_potential_cosine_shape:
+            if gap_potential_shape == 'cosine_half':
                 h0 = h0 + gap_potential*np.cos(2*np.pi * (x - L/2) / (2*L_junction))
+            elif gap_potential_shape == 'cosine':
+                h0 = h0 + gap_potential*1/2 * (1 + np.cos(2*np.pi * (x - L/2) / L_junction))
             else:
                 h0 = h0 + gap_potential
         
