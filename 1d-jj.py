@@ -11,23 +11,24 @@ mass =  0.03 * const.m_e
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 12e-6,
+    'electrode_length': 4e-6,
     'junction_length': 100e-9,
     'a': 5e-9,
     'g': -10
     }
 
-data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'disorder' ], args=args)
+data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'B' ], args=args)
 
 
 mu = 100e-3 * const.e
 
 phi = np.pi
-B = 0.2
+B_max = 1
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
-potential = 0.1 * mu
-
-for disorder in np.linspace(0, 0.05 * mu, 100):
+potential = 0.5 * mu
+disorder = 0
+for B in np.linspace(0, B_max, 100):
+    print("B: ", B)
     print("disorder / mu: ", disorder / mu)
     kf_m = -mass * alpha / const.hbar**2 - \
         1/const.hbar * np.sqrt(mass**2 * alpha**2 / const.hbar**2 + 2 * mass * mu)
@@ -43,6 +44,7 @@ for disorder in np.linspace(0, 0.05 * mu, 100):
         print("mu = %.2g meV" % (mu * 1e3 / const.e))
         n = n + 1
         ham = jj_kwant.spectrum.hamiltonian_jj_1d(
+#            debug=True,
             ky=ky,
             a=args['a'],
             m=mass,
@@ -54,13 +56,14 @@ for disorder in np.linspace(0, 0.05 * mu, 100):
             g_factor=args['g'],
             disorder=disorder,
             gap_potential = potential,
+            gap_potential_cosine_shape=True,
             mu=mu,
             alpha_rashba=alpha,
             salt=salt)
     
         evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
     
-        data_file.log(evs, {'ky': ky, 'disorder': disorder})
+        data_file.log(evs, {'ky': ky, 'B': B})
 
 
 

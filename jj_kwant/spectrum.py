@@ -8,7 +8,7 @@ import numpy as np
 import scipy.sparse.linalg
 
 import tinyarray
-
+import matplotlib.pyplot as plt
 
 import time
 
@@ -143,6 +143,7 @@ def _make_syst_jj_1d(
         junction_length=100e-9,
         mu=None,
         gap_potential=0,
+        gap_potential_cosine_shape=False,
         gap=None,
         delta_phi=None,
         alpha_rashba=0,
@@ -187,7 +188,10 @@ def _make_syst_jj_1d(
         if x < start_junction or x >= start_junction + L_junction:
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), real_gap * sigma_0)
         else:
-            h0 = h0 + gap_potential
+            if gap_potential_cosine_shape:
+                h0 = h0 + gap_potential*np.cos(2*np.pi * (x - L/2) / (2*L_junction))
+            else:
+                h0 = h0 + gap_potential
         
         # from "a josephson supercurrent diode" paper supplement
         zeeman = 0.5 * g_factor * const_bohr_magneton * (B[0] * sigma_x + B[1] * sigma_y + B[2] * sigma_z)
@@ -214,9 +218,17 @@ def _make_syst_jj_1d(
         return np.abs(onsite(site)[1, 0])
 
     if debug:
-        kwant.plot(syst,site_color=onsite_00)
-        kwant.plot(syst,site_color=onsite_01)
-    
+        sites_list = kwant.plotter.sys_leads_sites(syst)
+                
+        sites = [x[0] for x in sites_list[0]]
+                
+        onsite_list = [onsite_00(site) for site in sites]
+        pos_list = [site.pos for site in sites]
+        plt.plot(pos_list, onsite_list)
+        plt.show()
+        #        kwant.plot(syst,site_color=onsite_00)
+ #       kwant.plot(syst,site_color=onsite_01)
+        sys.exit(1)
     return syst.finalized()
 
 # API function
