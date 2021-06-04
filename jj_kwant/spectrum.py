@@ -49,6 +49,7 @@ def _make_syst_jj_2d(
         junction_length=100e-9,
         mu=None,
         gap_potential=0,
+        gap_potential_shape=None,
         disorder=0,
         gap=None,
         delta_phi=None,
@@ -90,11 +91,16 @@ def _make_syst_jj_2d(
         start_junction = int((L - L_junction) / 2)
         pairing = 0
         if x < start_junction or x >= start_junction + L_junction:
-            # in electrodes
+            # in electrodes: add pairing term
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
         else:
             # in junction
-            h0 = h0 + gap_potential
+            if gap_potential_shape == 'cosine_half':
+                h0 = h0 + gap_potential*np.cos(2*np.pi * (x - L/2) / (2*L_junction))
+            elif gap_potential_shape == 'cosine':
+                h0 = h0 + gap_potential*1/2 * (1 + np.cos(2*np.pi * (x - L/2) / L_junction))
+            else:
+                h0 = h0 + gap_potential
         #    mod = (y*a) % junction_island_spacing
         #    if mod < junction_island_width and\
         #       abs((x-L/2)*a) < junction_island_width/2:
