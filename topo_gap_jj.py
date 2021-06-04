@@ -5,7 +5,7 @@ import scipy.constants as const
 import numpy as np
 import jj_kwant.data
 import time
-
+import multiprocessing
 
 gap = 100e-6 * const.e
 
@@ -20,7 +20,7 @@ args = {
     'rashba': rashba,
     'width': 3e-6,
     'junction_length': 100e-9,
-    'electrode_length': 600e-9,
+    'electrode_length': 300e-9,
     'a': 5e-9,
     
     }
@@ -28,10 +28,14 @@ args = {
 
 data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B'], args=args)
 phi = np.pi
-B = 0.2
-for potential in np.linspace(0, mu, 100):
-    print("-----------------------")
-    print("potential / mu = ", potential / mu)
+
+potential = 0.5
+
+Bvals = np.linspace(0,1,100)
+
+
+def calc(B):
+    print("B = %.3g" % B)
     ham = jj_kwant.spectrum.hamiltonian_jj_2d(
         a = args['a'],
         m = args['mass'],
@@ -53,6 +57,15 @@ for potential in np.linspace(0, mu, 100):
         
     
     data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B})
+
+
+num_cores = 10
+
+
+if __name__ == '__main__':
+    with multiprocessing.Pool(num_cores) as p:
+        p.map(calc, Bvals)
+    
 
     
 

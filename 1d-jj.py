@@ -39,7 +39,7 @@ for B in np.linspace(0, B_max, 100):
     print("kf_m: %g" % kf_m)
     print("kf_p: %g" % (-kf_p))
     n = 0
-    for ky in np.linspace(1.1*kf_m, 0, 2000):
+    for ky in np.linspace(-3e8, -2.2e8, 2000):
         salt = str(time.time()) # new disorder for each disorder strength
         print("n: ", n)
         print("mu = %.2g meV" % (mu * 1e3 / const.e))
