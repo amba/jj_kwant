@@ -18,9 +18,9 @@ args = {
     'gap': gap,
     'mu': mu,
     'rashba': rashba,
-    'width': 3e-6,
+    'width': 5e-6,
     'junction_length': 100e-9,
-    'electrode_length': 300e-9,
+    'electrode_length': 600e-9,
     'a': 5e-9,
     
     }
