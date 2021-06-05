@@ -59,9 +59,9 @@ def _make_syst_jj_2d(
         debug=False,
         salt=''
 ):
-    
+    print("making 2d JJ system:\n", locals())
     t = const_hbar**2 / (2 * m * a**2)
-    print("m = %g, a = %g, width = %g, electrode_length = %g, junction_length = %g, t = %g" % (m, a, width, electrode_length, junction_length, t))
+#    print("m = %g, a = %g, width = %g, electrode_length = %g, junction_length = %g, t = %g" % (m, a, width, electrode_length, junction_length, t))
     W = int(width/a)
     L = int((2*electrode_length + junction_length) / a)
     L_junction = int(junction_length/a)

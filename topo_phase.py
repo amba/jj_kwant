@@ -18,9 +18,9 @@ args = {
     'gap': gap,
     'mu': mu,
     'rashba': rashba,
-    'width': 2e-6,
+    'width': 1e-6,
     'junction_length': 100e-9,
-    'electrode_length': 5e-6,
+    'electrode_length': 10e-6,
     'a': 5e-9,
     
     }
@@ -28,7 +28,6 @@ args = {
 
 data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B'], args=args)
 
-phi = np.pi
 
 potential = 0.3 * mu
 
