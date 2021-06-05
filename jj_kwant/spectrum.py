@@ -56,8 +56,6 @@ def _make_syst_jj_2d(
         alpha_rashba=0,
         B=[0,0,0],
         g_factor=-10,
-        # junction_island_width=0,
-        # junction_island_spacing=100e-9,
         debug=False,
         salt=''
 ):
@@ -98,7 +96,7 @@ def _make_syst_jj_2d(
             if gap_potential_shape == 'cosine_half':
                 h0 = h0 + gap_potential*np.cos(2*np.pi * (x - L/2) / (2*L_junction))
             elif gap_potential_shape == 'cosine':
-                h0 = h0 + gap_potential*1/2 * (1 + np.cos(2*np.pi * (x - L/2) / L_junction))
+                h0 = h0 + gap_potential * 1/2 * (1 + np.cos(2*np.pi * (x - L/2) / L_junction))
             else:
                 h0 = h0 + gap_potential
         #    mod = (y*a) % junction_island_spacing

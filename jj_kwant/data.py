@@ -45,6 +45,9 @@ class datafile:
         header = "# " + number_delimiter.join(params) + \
             number_delimiter +  "eigenvalue\n"
         self.datafile.write(header)
+
+        self.datafile.flush()
+        os.fsync(self.datafile)
         
         # generate metadata file
         # copy script args into metadata
