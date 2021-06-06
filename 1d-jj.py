@@ -5,6 +5,7 @@ import scipy.constants as const
 import numpy as np
 import jj_kwant.data
 import time
+import multiprocessing
 
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
@@ -25,21 +26,19 @@ mu = 100e-3 * const.e
 phi = np.pi
 B_max = 1
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
-potential = 0.5 * mu
+potential = 0
 disorder = 0
 
-for B in np.linspace(0, B_max, 100):
+def calc(problem):
+    B = problem['B']
     print("B: ", B)
-    print("disorder / mu: ", disorder / mu)
+
     kf_m = -mass * alpha / const.hbar**2 - \
         1/const.hbar * np.sqrt(mass**2 * alpha**2 / const.hbar**2 + 2 * mass * mu)
     kf_p = -mass * alpha / const.hbar**2 + \
         1/const.hbar * np.sqrt(mass**2 * alpha**2 / const.hbar**2 + 2 * mass * mu)
-    print("\n\n--------------------------")
-    print("kf_m: %g" % kf_m)
-    print("kf_p: %g" % (-kf_p))
     n = 0
-    for ky in np.linspace(-3e8, -2.2e8, 2000):
+    for ky in np.linspace(-3e8, 0, 200):
         salt = str(time.time()) # new disorder for each disorder strength
         print("n: ", n)
         print("mu = %.2g meV" % (mu * 1e3 / const.e))
@@ -65,6 +64,20 @@ for B in np.linspace(0, B_max, 100):
         evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
     
         data_file.log(evs, {'ky': ky, 'B': B})
+
+
+num_cores = 100
+
+
+if __name__ == '__main__':
+    B_vals = np.linspace(0,1,100)
+#    potential_vals = np.linspace(0,0.5*mu,20)
+    problems = []
+    for B in B_vals:
+        problems.append({'B': B})
+        
+    with multiprocessing.Pool(num_cores) as p:
+        p.map(calc, problems)
 
 
 

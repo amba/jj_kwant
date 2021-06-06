@@ -27,19 +27,23 @@ def H_rashba(kx=None, ky=None, m=None, μ=None, alpha=None, g=None, B=[0,0,0]):
 
 
 m = 0.03 * const_m_e
-μ = 100e-3 * const_e
+μ = -10e-3 * const_e
 g = -10
 alpha = 20e-3 * const_e * 1e-9 # 10 meV nm
 
-kf_p = -m * alpha /( const_hbar**2) \
-    + 1/const_hbar * np.sqrt(m**2 * alpha**2 /const_hbar**2 + 2 * m * μ)
+E_min = -alpha**2 * m / (2*const_hbar**2)
+print("k_min = %.3g 1/m" % (alpha * m / const_hbar**2))
+print("E_min = %.3g meV" % ((E_min - μ) / const_e * 1e3))
 
-kf_m = -m * alpha / (const_hbar**2) \
-    - 1/const_hbar * np.sqrt(m**2 * alpha**2 / const_hbar**2 + 2 * m * μ)
+# kf_p = -m * alpha /( const_hbar**2) \
+#     + 1/const_hbar * np.sqrt(m**2 * alpha**2 /const_hbar**2 + 2 * m * μ)
 
-print("kf-: %.5g, kf+: %.5g" % (kf_m, kf_p))
-print("k * alpha = %.4g meV" % (kf_m * alpha / const_e * 1e3))
-print("E_z = g μ_B / T = %.4g meV / T" % (g * const_bohr_magneton / const_e * 1e3))
+# kf_m = -m * alpha / (const_hbar**2) \
+#     - 1/const_hbar * np.sqrt(m**2 * alpha**2 / const_hbar**2 + 2 * m * μ)
+
+# print("kf-: %.5g, kf+: %.5g" % (kf_m, kf_p))
+# print("k * alpha = %.4g meV" % (kf_m * alpha / const_e * 1e3))
+# print("E_z = g μ_B / T = %.4g meV / T" % (g * const_bohr_magneton / const_e * 1e3))
 # #B_x = 1
 
 # k_max = 1 / const_hbar * np.sqrt(2 * m * μ)

@@ -116,14 +116,16 @@ def _make_syst_jj_2d(
     
     # Hoppings
 
-    # Rashba term in hamiltonian: -iα(∂_x σ_y - ∂_y σ_x)
-
+    # Rashba term in hamiltonian: -iα(∂_x σ_y - ∂_y σ_x) = α(k_xσ_y - k_yσ_x)
+    # ∂_x -> 1/(2a) (f_{n+1} - f_{n-1})
+    # k_x -> -i/(2a)(f_{n+1} - f_{n-1})
+    
     # x direction
     syst[kwant.builder.HoppingKind((1, 0), lat, lat)] = \
-        np.kron(tau_z, -t * sigma_0 + 1j * 1/a * alpha_rashba * sigma_y / 2)
+        np.kron(tau_z, -t * sigma_0 -1j/(2*a) * alpha_rashba * sigma_y)
     # y direction
     syst[kwant.builder.HoppingKind((0, 1), lat, lat)] = \
-        np.kron(tau_z, -t * sigma_0 - 1j * 1/a * alpha_rashba * sigma_x / 2)
+        np.kron(tau_z, -t * sigma_0 + 1j/(2*a) * alpha_rashba * sigma_x)
     
     # debug functions
 
@@ -159,10 +161,9 @@ def _make_syst_jj_1d(
         ky=0,
         salt='',
 ):
-    
+    print("making 1d JJ system:\n", locals())
     t = const_hbar**2 / (2 * m * a**2)
     print("phi / π = %g" % (delta_phi / np.pi))
-    print("m = %g, a = %g, electrode_length = %g, junction_length = %g, t = %g" % (m, a, electrode_length, junction_length, t))
     L = int((2*electrode_length + junction_length) / a)
     L_junction = int(junction_length/a)
     print("L = %d, L_junction = %d" % (L, L_junction))
@@ -202,6 +203,8 @@ def _make_syst_jj_1d(
         # from "a josephson supercurrent diode" paper supplement
         zeeman = 0.5 * g_factor * const_bohr_magneton * (B[0] * sigma_x + B[1] * sigma_y + B[2] * sigma_z)
 
+        # Rashba term in hamiltonian: -iα(∂_x σ_y - ∂_y σ_x) = α(k_xσ_y - k_yσ_x)
+        # add constant -α k_y σ_x term to onsite hamiltonian
         h0 = h0 * sigma_0 - alpha_rashba * ky * sigma_x
         return np.kron(tau_z, h0) + np.kron(tau_0, zeeman) + pairing
     
@@ -210,11 +213,14 @@ def _make_syst_jj_1d(
     
     # Hoppings
 
-    # Rashba term in hamiltonian: -iα(∂_x σ_y - ∂_y σ_x)
-
+    # Rashba term in hamiltonian: -iα(∂_x σ_y - ∂_y σ_x) = α(k_xσ_y - k_yσ_x)
+    # ∂_x -> 1/(2a) (f_{n+1} - f_{n-1})
+    # k_x -> -i/(2a)(f_{n+1} - f_{n-1})
+    
     # x direction
+    # add hopping for α k_x σ_y = -i/(2a) |n+1><n| σ_y + h.c.
     syst[kwant.builder.HoppingKind((1,), lat, lat)] = \
-        np.kron(tau_z, -t * sigma_0 + 1j * 1/a * alpha_rashba * sigma_y / 2)
+        np.kron(tau_z, -t * sigma_0 -1j/(2*a) * alpha_rashba * sigma_y)
     
     # debug functions
 
