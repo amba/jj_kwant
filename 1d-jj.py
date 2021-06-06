@@ -26,7 +26,7 @@ mu = 100e-3 * const.e
 phi = np.pi
 B_max = 1
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
-potential = 0
+potential = 0.3 * mu
 disorder = 0
 
 def calc(problem):
@@ -62,7 +62,7 @@ def calc(problem):
         alpha_rashba=alpha,
         salt='')
     
-    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
+    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
     
     data_file.log(evs, {'ky': ky, 'B': B})
 
