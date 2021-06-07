@@ -25,7 +25,7 @@ mu = 100e-3 * const.e
 
 phi = np.pi
 B_max = 1
-alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
+alpha = 0# 20e-3 * const.e * 1e-9 # 20 meV nm
 potential = 0.8 * mu
 disorder = 0
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 #    potential_vals = np.linspace(0,0.5*mu,20)
     problems = []
     for B in B_vals:
-        for ky in np.linspace(-3e8,3e8,2000):
+        for ky in np.linspace(-3e8,0,2000):
             problems.append({'ky': ky, 'B': B})
         
     with multiprocessing.Pool(num_cores) as p:
