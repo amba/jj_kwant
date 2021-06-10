@@ -7,6 +7,7 @@ import jj_kwant.data
 import time
 import multiprocessing
 
+
 gap = 100e-6 * const.e
 
 rashba = 20e-3 * const.e * 1e-9 # 20 meV nm
@@ -18,7 +19,7 @@ args = {
     'gap': gap,
     'mu': mu,
     'rashba': rashba,
-    'width': 6e-6,
+    'width': 10e-6,
     'junction_length': 100e-9,
     'electrode_length': 2e-6,
     'a': 5e-9,
@@ -61,7 +62,7 @@ def calc(B):
     data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B})
 
 
-num_cores = 10
+num_cores = 1
 
 
 if __name__ == '__main__':

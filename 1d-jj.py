@@ -18,20 +18,20 @@ args = {
     'g': -10
     }
 
-data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'B' ], args=args)
+data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'B', 'phi' ], args=args)
 
 
 mu = 100e-3 * const.e
 
-phi = np.pi
-B_max = 1
-alpha = 50e-3 * const.e * 1e-9 # 20 meV nm
-potential = 0.8 * mu
+B = 0.1
+#B_max = 1
+alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
+potential = 0 * mu
 disorder = 0
 
 def calc(problem):
-    B = problem['B']
-    ky = problem['ky']
+    ky  = problem['ky']
+    phi = problem['phi']
     print("B: ", B)
 
     # kf_m = -mass * alpha / const.hbar**2 - \
@@ -64,19 +64,19 @@ def calc(problem):
     
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
     
-    data_file.log(evs, {'ky': ky, 'B': B})
+    data_file.log(evs, {'ky': ky, 'B': B, 'phi': phi})
 
 
-num_cores = 120
+num_cores = 100
 
 
 if __name__ == '__main__':
-    B_vals = (0.3,)
+    phi_vals = np.linspace(0,np.pi, 10)
 #    potential_vals = np.linspace(0,0.5*mu,20)
     problems = []
-    for B in B_vals:
+    for phi in phi_vals:
         for ky in np.linspace(-3e8,0,2000):
-            problems.append({'ky': ky, 'B': B})
+            problems.append({'ky': ky, 'phi': phi})
         
     with multiprocessing.Pool(num_cores) as p:
         p.map(calc, problems)

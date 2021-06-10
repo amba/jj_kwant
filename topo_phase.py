@@ -9,7 +9,7 @@ import multiprocessing
 
 gap = 100e-6 * const.e
 
-rashba = 20e-3 * const.e * 1e-9 # 20 meV nm
+rashba = 0# 20e-3 * const.e * 1e-9 # 20 meV nm
 mu = 100e-3 * const.e # 100 meV 
 #junction_island_width = 50e-9
 #junction_island_spacing = 100e-9
