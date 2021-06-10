@@ -282,7 +282,7 @@ def hamiltonian_jj_2d(timing=True, *args, **kwargs):
 def hamiltonian_jj_1d(timing=True, *args, **kwargs):
     return _hamiltonian(func=_make_syst_jj_1d, *args, **kwargs)
 
-def mumps_eigsh(matrix, k=None, tol=None, which=None, v0=None, return_eigenvectors=False):
+def mumps_eigsh(matrix, k=None, tol=None, which=None):
     class LuInv(scipy.sparse.linalg.LinearOperator):
 
         def __init__(self, matrix):
@@ -297,16 +297,15 @@ def mumps_eigsh(matrix, k=None, tol=None, which=None, v0=None, return_eigenvecto
 
     opinv = LuInv(matrix)
     return scipy.sparse.linalg.eigsh(
-        matrix, k, sigma=0, OPinv=opinv, v0=v0,
-        return_eigenvectors=return_eigenvectors, which=which, tol=tol
+        matrix, k, sigma=0, OPinv=opinv, which=which, tol=tol
     )
 
 
 # API function
-def low_energy_spectrum(ham_mat, n_evs, tol=1e-3, which='LM', timing=True, v0=None, return_eigenvectors=False):
+def low_energy_spectrum(ham_mat, n_evs, tol=1e-3, which='LM', timing=True):
     print("calculating %d eigenvalues of hamiltionian with shape" % n_evs, ham_mat.shape)
     t_start = time.time()
-    evs = mumps_eigsh(ham_mat, k=n_evs, tol=tol, which=which, v0=v0, return_eigenvectors=return_eigenvectors)
+    evs = mumps_eigsh(ham_mat, k=n_evs, tol=tol, which=which)
     print("execution time: %.2f s" % (time.time() - t_start))
     return evs
 
