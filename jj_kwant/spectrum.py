@@ -53,7 +53,26 @@ def _make_syst_jj_2d(
 #        disorder=0,
         gap=None,
         delta_phi=None,
-        alpha_rashba=0,
+
+
+        # pure rashba:
+        #
+        #  0  1
+        # -1  0
+
+        #
+        # pure dresselhaus
+        # 0 1
+        # 1 0
+        
+        SOI=np.array([[0, 0],[ 0, 0]]),
+        #        | a   b |
+        # SOI  = |       |
+        #        | c   d |
+        
+        # (σ_x, σ_y) x SOI x (k_x ,k_y)^t =
+        # k_x(a σ_x + c σ_y) + k_y(b σ_x + d σ_y)
+        
         B=[0,0,0],
         g_factor=-10,
         debug=False,
@@ -122,11 +141,13 @@ def _make_syst_jj_2d(
     # k_x -> -i/(2a)(f_{n+1} - f_{n-1})
     
     # x direction
+    SOI_x = SOI[0,0] * sigma_x + SOI[1,0] * sigma_y
+    SOI_y = SOI[0,1] * sigma_x + SOI[1,1] * sigma_y
     syst[kwant.builder.HoppingKind((1, 0), lat, lat)] = \
-        np.kron(tau_z, -t * sigma_0 -1j/(2*a) * alpha_rashba * sigma_y)
+        np.kron(tau_z, -t * sigma_0 -1j/(2*a) * SOI_x)
     # y direction
     syst[kwant.builder.HoppingKind((0, 1), lat, lat)] = \
-        np.kron(tau_z, -t * sigma_0 + 1j/(2*a) * alpha_rashba * sigma_x)
+        np.kron(tau_z, -t * sigma_0 -1j/(2*a) * SOI_y)
     
     # debug functions
 
