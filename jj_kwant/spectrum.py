@@ -297,7 +297,7 @@ def mumps_eigsh(matrix, k=None, tol=None, which=None):
 
     opinv = LuInv(matrix)
     return scipy.sparse.linalg.eigsh(
-        matrix, k, sigma=0, OPinv=opinv, which=which, tol=tol
+        matrix, k, sigma=0, OPinv=opinv, which=which, tol=tol, return_eigenvectors=False,
     )
 
 
