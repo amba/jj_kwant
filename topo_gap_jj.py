@@ -6,7 +6,7 @@ import numpy as np
 import jj_kwant.data
 import time
 import multiprocessing
-
+import sys
 
 gap = 100e-6 * const.e
 
@@ -19,9 +19,9 @@ args = {
     'gap': gap,
     'mu': mu,
     'rashba': rashba,
-    'width': 10e-6,
+    'width': 3e-6,
     'junction_length': 100e-9,
-    'electrode_length': 2e-6,
+    'electrode_length': 100e-9,
     'a': 5e-9,
     
     }
@@ -55,7 +55,7 @@ def calc(B):
             #junction_island_spacing = junction_island_spacing,
             # debug=True
     );
-     
+    sys.exit(1)
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 5)
         
     
@@ -63,11 +63,11 @@ def calc(B):
 
 
 num_cores = 1
+calc(0)
 
-
-if __name__ == '__main__':
-    with multiprocessing.Pool(num_cores) as p:
-        p.map(calc, Bvals)
+# if __name__ == '__main__':
+#     with multiprocessing.Pool(num_cores) as p:
+#         p.map(calc, Bvals)
     
 
     
