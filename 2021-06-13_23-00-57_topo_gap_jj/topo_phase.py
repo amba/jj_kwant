@@ -18,14 +18,14 @@ args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
  #   'rashba': rashba,
-    'width': 6e-6,
+    'width': 5e-6,
     'junction_length': 100e-9,
-    'electrode_length': 1e-6,
+    'electrode_length': 2e-6,
     'a': 5e-9
 }
 
 
-data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B', 'mu', 'soi', 'diff'], args=args)
+data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B', 'mu', 'soi', 'free_energy'], args=args)
 
 
 
@@ -56,10 +56,11 @@ def calc(problem):
     );
      
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 20)
-    diff = evs[0] - evs[1]
-    print("evs: ", evs)
-    print("logging evs")    
-    data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B, 'mu': mu, 'soi': soi, 'diff': diff})
+    
+    
+    print("logging evs")
+    free_energy = np.sum(evs)
+    data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B, 'mu': mu, 'soi': soi, 'free_energy': free_energy})
 
 
 num_cores = 20
@@ -71,7 +72,7 @@ if __name__ == '__main__':
     
     mu_vals = (100e-3 * const.e, )
 
-    B_vals = np.linspace(0,2,100)
+    B_vals = np.linspace(0,1.5,30)
     soi_vals = (20* meVnm,)
     phi_vals = np.linspace(0, np.pi, 100)
     
