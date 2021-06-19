@@ -18,9 +18,9 @@ args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
  #   'rashba': rashba,
-    'width': 4e-6,
+    'width': 5e-6,
     'junction_length': 100e-9,
-    'electrode_length': 1e-6,
+    'electrode_length': 1.5e-6,
     'a': 5e-9
 }
 
@@ -33,11 +33,11 @@ def calc(problem):
     mu = problem['mu']
     phi = problem['phi']
     B = problem['B']
-    soi = problem['soi']
+    SOI = problem['soi'] # 2x2 matrix
+    
     alpha = problem['alpha']
     
     potential = 0
-    SOI = np.array([[0, soi], [alpha*soi, 0]])
     ham = jj_kwant.spectrum.hamiltonian_jj_2d(
         a = args['a'],
         m = args['mass'],
@@ -56,37 +56,34 @@ def calc(problem):
             # debug=True
     );
      
-    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 20)
+    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 2)
     
     
     print("logging evs")
     free_energy = np.sum(evs)
-    data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B, 'mu': mu, 'soi': soi, 'free_energy': free_energy, 'alpha': alpha})
+    data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B, 'mu': mu,'free_energy': free_energy, 's_xx': SOI[0,0], 's_xy': SOI[0,1], 's_yx': SOI[1,0], 's_yy': SOI[1,1]})
 
 
 num_cores = 50
 
 
 if __name__ == '__main__':
-#    phi_vals = (np.pi, )
-    
-    
     mu_vals = (100e-3 * const.e, )
-
-    B_vals = np.linspace(0,1.5,30)
-    soi_vals = (20* meVnm,)
-    alpha_vals = (-0.15,)
-    phi_vals = np.linspace(-np.pi,np.pi,301)    
+    B_vals = (0.1,)
+    phi_vals = (np.pi)
     problems = []
-    for mu in mu_vals:
-        for soi  in soi_vals:
-            for B in B_vals:
-                for phi in phi_vals:
-                    for alpha in alpha_vals:
-                        problems.append({
-                            'mu': mu, 'phi': phi, 'B': B, 'soi': soi,
-                            'alpha': alpha})
-        
+    soi_vals = np.linspace(-1,1,10) * meVnm
+    for xx in soi_vals:
+        for xy in soi_vals:
+            for yx in soi_vals:
+                for yy in soi_vals:
+                    SOI = np.array([[xx, xy], [yx, yy]])
+                    problems.append({
+                        'mu': mu, 'phi': phi, 'B': B,
+                        'soi': SOI,
+                        })
+
+                    
     with multiprocessing.Pool(num_cores) as p:
         p.map(calc, problems)
     
