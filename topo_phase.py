@@ -18,9 +18,9 @@ args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
  #   'rashba': rashba,
-    'width': 5e-6,
+    'width': 3e-6,
     'junction_length': 100e-9,
-    'electrode_length': 2e-6,
+    'electrode_length': 1.5e-6,
     'a': 5e-9
 }
 
@@ -59,11 +59,11 @@ def calc(problem):
     
     
     print("logging evs")
-    free_energy = np.sum(evs)
+    free_energy = -np.sum(evs)
     data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B, 'mu': mu, 'soi': soi, 'free_energy': free_energy})
 
 
-num_cores = 20
+num_cores = 50
 
 
 if __name__ == '__main__':
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     B_vals = np.linspace(0,1.5,30)
     soi_vals = (20* meVnm,)
-    phi_vals = np.linspace(0, np.pi, 100)
+    phi_vals = np.linspace(-np.pi, np.pi, 301)
     
     problems = []
     for mu in mu_vals:

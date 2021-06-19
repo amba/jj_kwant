@@ -75,8 +75,8 @@ if __name__ == '__main__':
 
     B_vals = np.linspace(0,1.5,30)
     soi_vals = (20* meVnm,)
-    alpha_vals = np.linspace(0, -1, 20)
-    phi_vals = (0,)    
+    alpha_vals = (-0.15,)
+    phi_vals = np.linspace(-np.pi,np.pi,301)    
     problems = []
     for mu in mu_vals:
         for soi  in soi_vals:
