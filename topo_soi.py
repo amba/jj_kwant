@@ -25,7 +25,7 @@ args = {
 }
 
 
-data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B', 'mu', 'soi', 'alpha', 'free_energy'], args=args)
+data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B', 'mu', 's_xx', 's_xy', 's_yx', 's_yy', 'diff'], args=args)
 
 
 
@@ -35,7 +35,7 @@ def calc(problem):
     B = problem['B']
     SOI = problem['soi'] # 2x2 matrix
     
-    alpha = problem['alpha']
+    
     
     potential = 0
     ham = jj_kwant.spectrum.hamiltonian_jj_2d(
@@ -60,19 +60,20 @@ def calc(problem):
     
     
     print("logging evs")
-    free_energy = np.sum(evs)
-    data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B, 'mu': mu,'free_energy': free_energy, 's_xx': SOI[0,0], 's_xy': SOI[0,1], 's_yx': SOI[1,0], 's_yy': SOI[1,1]})
+    diff = evs[0] - evs[1]
+    print("diff: ", diff)
+    data_file.log(evs, {'phi': phi, 'potential': potential, 'B': B, 'mu': mu, 's_xx': SOI[0,0], 's_xy': SOI[0,1], 's_yx': SOI[1,0], 's_yy': SOI[1,1], 'diff': diff})
 
 
-num_cores = 50
+num_cores = 30
 
 
 if __name__ == '__main__':
-    mu_vals = (100e-3 * const.e, )
-    B_vals = (0.1,)
-    phi_vals = (np.pi)
+    mu = 100e-3 * const.e
+    B = 0.1
+    phi = np.pi
     problems = []
-    soi_vals = np.linspace(-1,1,10) * meVnm
+    soi_vals = np.linspace(-1,1,11) * 20 * meVnm
     for xx in soi_vals:
         for xy in soi_vals:
             for yx in soi_vals:
