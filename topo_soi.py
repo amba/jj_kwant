@@ -6,6 +6,7 @@ import numpy as np
 import jj_kwant.data
 import time
 import multiprocessing
+import psutil
 
 gap = 100e-6 * const.e
 meVnm = 1e-3 * const.e * 1e-9
@@ -27,17 +28,25 @@ args = {
 
 data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B', 'mu', 's_xx', 's_xy', 's_yx', 's_yy', 'diff'], args=args)
 
+def wait_for_mem():
+    while True:
+        mem_percent = psutil.virtual_memory().percent
+        if mem_percent < 0.8:
+            break;
+        else:
+            print("cannot start process. used memory is %.g percent" % mem_percent * 100)
+            time.sleep(30)
 
-
+            
 def calc(problem):
     mu = problem['mu']
     phi = problem['phi']
     B = problem['B']
     SOI = problem['soi'] # 2x2 matrix
+    potential = 0.8 * mu
+
+    wait_for_mem()
     
-    
-    
-    potential = 0
     ham = jj_kwant.spectrum.hamiltonian_jj_2d(
         a = args['a'],
         m = args['mass'],
