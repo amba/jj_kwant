@@ -11,7 +11,7 @@ import random
 
 gap = 100e-6 * const.e
 meVnm = 1e-3 * const.e * 1e-9
-num_cores = 50
+num_cores = 30
 
 #rashba = 20e-3 * const.e * 1e-9 # 20 meV nm
 
@@ -21,9 +21,9 @@ args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
  #   'rashba': rashba,
-    'width': 4e-6,
+    'width': 5e-6,
     'junction_length': 100e-9,
-    'electrode_length': 1.5e-6,
+    'electrode_length': 2e-6,
     'a': 5e-9
 }
 
@@ -37,7 +37,7 @@ def wait_for_mem():
             break;
         else:
             print("cannot start process. used memory is %.1f percent" % mem_percent)
-            time.sleep(300 * random.random())
+            time.sleep(600 * random.random())
 
 start_time = time.time()            
 def calc(problem):
@@ -45,12 +45,12 @@ def calc(problem):
     phi = problem['phi']
     B = problem['B']
     SOI = problem['soi'] # 2x2 matrix
-    potential = 0.85 * mu
+    potential = 0
 
 
     # do not start all processes at once
     if time.time() - start_time < 100:
-        sleep_time = 400 * random.random()
+        sleep_time = 600 * random.random()
         print("sleeping for ", sleep_time)
         time.sleep(sleep_time)
     
@@ -89,23 +89,18 @@ def calc(problem):
 
 
 if __name__ == '__main__':
-    mu = 100e-3 * const.e
+    mu_vals = np.linspace(0, 100e-3 * const.e, 100)
     B = 0.1
     phi = np.pi
     problems = []
-    soi_vals = np.linspace(0, 1,10) * 20 * meVnm
-    
-    for xx in soi_vals:
-        for xy in soi_vals:
-            for yx in soi_vals:
-                for yy in soi_vals:
-                    SOI = np.array([[xx, xy], [yx, yy]])
-                    
-                    problems.append({
-                        'mu': mu, 'phi': phi, 'B': B,
-                        'soi': SOI,
-                        
-                        })
+    soi_vals = np.linspace(0, 1,5) * 20 * meVnm
+    for soi in soi_vals:
+        for mu in mu_vals:
+            SOI = np.array([[0, soi], [-soi, 0]])
+            problems.append({
+                'mu': mu, 'phi': phi, 'B': B,
+                'soi': SOI,
+            })
 
                     
     with multiprocessing.Pool(num_cores) as p:
