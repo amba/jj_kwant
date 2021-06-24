@@ -15,15 +15,6 @@ import argparse
 
 #args = parser.parse_args()
 
-energy_file = 'free_energy.dat'
-
-with open('args.json','r') as infile:
-    parameters = json.load(infile)
-
-print("simulation parameters:\n", parameters)
-
-gap = parameters['gap'] * const.e
-
 
 def open_3d_file(file):
     fh = open(file, 'r')
@@ -38,7 +29,7 @@ def open_3d_file(file):
     return arrays, header
 
 
-data, header = open_3d_file(energy_file)
+data, header = open_3d_file('data.dat')
 
 col_legends = header.split()[1:]
 col_dict = {}
