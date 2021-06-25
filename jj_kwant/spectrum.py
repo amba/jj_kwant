@@ -50,7 +50,7 @@ def _make_syst_jj_2d(
         mu=None,
         gap_potential=0,
         gap_potential_shape=None,
-#        disorder=0,
+        disorder=0,
         gap=None,
         delta_phi=None,
 
@@ -98,8 +98,8 @@ def _make_syst_jj_2d(
         
         h0 = 4*t - mu
         # variance of h0 is disorder
- #       if (disorder != 0):
-  #          h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
+        if (disorder != 0):
+            h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
             
         dphi = delta_phi
         

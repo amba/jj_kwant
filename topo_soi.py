@@ -21,9 +21,9 @@ args = {
     'mass': 0.02 * const.m_e,
     'gap': gap,
  #   'rashba': rashba,
-    'width': 5e-6,
+    'width': 1e-6,
     'junction_length': 100e-9,
-    'electrode_length': 2e-6,
+    'electrode_length': 1e-6,
     'a': 5e-9
 }
 
@@ -37,7 +37,7 @@ def wait_for_mem():
             break;
         else:
             print("cannot start process. used memory is %.1f percent" % mem_percent)
-            time.sleep(600 * random.random())
+            time.sleep(6 * random.random())
 
 start_time = time.time()            
 def calc(problem):
@@ -50,7 +50,7 @@ def calc(problem):
 
     # do not start all processes at once
     if time.time() - start_time < 100:
-        sleep_time = 600 * random.random()
+        sleep_time = 6 * random.random()
         print("sleeping for ", sleep_time)
         time.sleep(sleep_time)
     
