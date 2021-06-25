@@ -11,7 +11,7 @@ import random
 
 gap = 100e-6 * const.e
 meVnm = 1e-3 * const.e * 1e-9
-num_cores = 30
+num_cores = 40
 
 #rashba = 20e-3 * const.e * 1e-9 # 20 meV nm
 
@@ -28,7 +28,7 @@ args = {
 }
 
 
-data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'B', 'mu', 's_xx', 's_xy', 's_yx', 's_yy', 'diff'], args=args)
+data_file = jj_kwant.data.datafile(folder="topo_gap_jj", params=['phi', 'potential', 'disorder', 'B', 'mu', 's_xx', 's_xy', 's_yx', 's_yy', 'diff'], args=args)
 
 def wait_for_mem():
     while True:
@@ -45,8 +45,8 @@ def calc(problem):
     phi = problem['phi']
     B = problem['B']
     SOI = problem['soi'] # 2x2 matrix
-    potential = 0
-
+    potential = problem['potential']
+    disorder = problem['disorder']
 
     # do not start all processes at once
     if time.time() - start_time < 100:
@@ -61,6 +61,7 @@ def calc(problem):
         m = args['mass'],
         gap_potential = potential,
         gap_potential_shape='cosine',
+        disorder=disorder,
         mu = mu,
         gap = args['gap'],
         SOI = SOI,
@@ -69,6 +70,7 @@ def calc(problem):
         electrode_length=args['electrode_length'],
         B = [0, B, 0],
         delta_phi = phi,
+        salt=str(time.time())
             #junction_island_width = junction_island_width,
             #junction_island_spacing = junction_island_spacing,
             # debug=True
@@ -89,18 +91,24 @@ def calc(problem):
 
 
 if __name__ == '__main__':
-    mu_vals = np.linspace(0, 100e-3 * const.e, 100)
+    mu_vals = np.linspace(0, 20e-3 * const.e, 200)
     B = 0.1
     phi = np.pi
+    potential_vals = (0,)
+    disorder_vals = np.linspace(0, 10e-3*const.e, 100)
+    soi_vals = (20 * meVnm,)
     problems = []
-    soi_vals = np.linspace(0, 1,5) * 20 * meVnm
-    for soi in soi_vals:
+    for potential in potential_vals:
         for mu in mu_vals:
-            SOI = np.array([[0, soi], [-soi, 0]])
-            problems.append({
-                'mu': mu, 'phi': phi, 'B': B,
-                'soi': SOI,
-            })
+            for soi in soi_vals:
+                for disorder in disorder_vals:
+                    SOI = np.array([[0, soi], [-soi, 0]])
+                    problems.append({
+                        'mu': mu, 'phi': phi, 'B': B,
+                        'soi': SOI,
+                        'potential': potential,
+                        'disorder': disorder,
+                    })
 
                     
     with multiprocessing.Pool(num_cores) as p:
