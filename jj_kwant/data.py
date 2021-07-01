@@ -65,6 +65,7 @@ class datafile:
         line = ''
         for param in self.params:
             if not param in params:
+                print("missing key")
                 raise ValueError("missing key in params: %s" % param)
             values.append(number_format % params[param])
         params_line = number_delimiter.join(values)
