@@ -31,6 +31,7 @@ parser.add_argument('--mass', help="effective mass / m_e(default: 0.03)", defaul
 parser.add_argument('--disorder', help="random disorder potential (in units of fermi energy E_F)", type=float, default=0)
 parser.add_argument('--gap', help="superconducting gap / eV (default: 200e-6)", default=200e-6, type=float)
 parser.add_argument('--by', help="in-plane magnetic field in y-direction (Tesla)", default=0, type=float)
+parser.add_argument('--g', help="g factor", default=-10, type=float)
 parser.add_argument('--rashba', help="rashba coefficient (meV nm)", default=0, type=float)
 
 
@@ -51,7 +52,7 @@ junction_length = args.junction_length
 gap = args.gap * const.e
 
 B_y = args.by
-
+g_factor = args.g
 alpha_rashba = args.rashba * 1e-3 * const.e * 1e-9 # meV * nm
 
 n_s = args.carrier_density
@@ -103,7 +104,7 @@ fh_spectrum.write("# phi\t\tenergy\n")
 
 def make_syst(m = 0.03 * const.m_e, a=5e-9, width=3e-6,
               electrode_length = 3e-6, junction_length=100e-9,
-              mu=0, disorder=0, gap=0, delta_phi=0, alpha_rashba=0, B=[0,0,0], g_factor=-10):
+              mu=0, disorder=0, gap=0, delta_phi=0, alpha_rashba=0, B=[0,0,0], g_factor=g_factor):
     t = const.hbar**2 / (2 * m * a**2)
     print("m = %g, a = %g, width = %g, electrode_length = %g, junction_length = %g, t = %g" % (m, a, width, electrode_length, junction_length, t))
     W = int(width/a)
