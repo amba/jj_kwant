@@ -22,8 +22,6 @@ data_file = jj_kwant.data.datafile(folder="jj_1d", params=['ky', 'B', 'phi' ], a
 
 
 mu = 100e-3 * const.e
-k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
-print("k_F = ", k_fermi)
 
 
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
@@ -63,21 +61,21 @@ def calc(problem):
         alpha_rashba=alpha,
         salt='')
     
-    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
+    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
     
     data_file.log(evs, {'ky': ky, 'B': B, 'phi': phi})
 
 
-num_cores = 100
+num_cores = 2
 
 
 if __name__ == '__main__':
-    phi_vals = np.linspace(-np.pi, np.pi, 100)
+    phi_vals = (0,)
 #    potential_vals = np.linspace(0,0.5*mu,20)
     problems = []
-    Bvals = (0.5,) #np.linspace(0,0.6,100)
+    Bvals = np.linspace(0,0.6,100)
     for phi in phi_vals:
-        for ky in np.linspace(-0.9*k_fermi,0.9*k_fermi, 100):
+        for ky in np.linspace(-1e7,0,10):
             for B in Bvals:
                 problems.append({'ky': ky, 'phi': phi, 'B': B})
         

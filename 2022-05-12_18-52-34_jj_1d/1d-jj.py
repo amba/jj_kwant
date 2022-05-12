@@ -63,16 +63,16 @@ def calc(problem):
         alpha_rashba=alpha,
         salt='')
     
-    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
+    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
     
     data_file.log(evs, {'ky': ky, 'B': B, 'phi': phi})
 
 
-num_cores = 100
+num_cores = 2
 
 
 if __name__ == '__main__':
-    phi_vals = np.linspace(-np.pi, np.pi, 100)
+    phi_vals = np.linspace(-npi.pi, np.pi, 100)
 #    potential_vals = np.linspace(0,0.5*mu,20)
     problems = []
     Bvals = (0.5,) #np.linspace(0,0.6,100)

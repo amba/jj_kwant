@@ -63,12 +63,12 @@ def calc(problem):
         alpha_rashba=alpha,
         salt='')
     
-    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
+    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 3)
     
     data_file.log(evs, {'ky': ky, 'B': B, 'phi': phi})
 
 
-num_cores = 100
+num_cores = 2
 
 
 if __name__ == '__main__':
