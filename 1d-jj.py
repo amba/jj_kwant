@@ -68,14 +68,14 @@ def calc(problem):
     data_file.log(evs, {'ky': ky, 'B': B, 'phi': phi})
 
 
-num_cores = 100
+num_cores = 120
 
 
 if __name__ == '__main__':
     phi_vals = np.linspace(-np.pi, np.pi, 100)
 #    potential_vals = np.linspace(0,0.5*mu,20)
     problems = []
-    Bvals = (0.5,) #np.linspace(0,0.6,100)
+    Bvals = (0, 0.1, 0.5, 0.6) #np.linspace(0,0.6,100)
     for phi in phi_vals:
         for ky in np.linspace(-0.9*k_fermi,0.9*k_fermi, 100):
             for B in Bvals:
