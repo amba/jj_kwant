@@ -15,7 +15,7 @@ mass =  0.03 * const.m_e
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 500e-6,
+    'electrode_length': 1e-6,
     'junction_length': 1e-9,
     'a': 5e-9,
     'g': -10
