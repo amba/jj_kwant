@@ -8,12 +8,14 @@ import pathlib
 import sys
 import shutil
 import os.path
+from scipy.sparse.linalg import eigs
+
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 1e-6,
+    'electrode_length': 500e-6,
     'junction_length': 1e-9,
     'a': 5e-9,
     'g': -10
@@ -60,9 +62,8 @@ def calc(ky=None, phi=None, B=None):
         mu=mu,
         alpha_rashba=alpha,
         salt='')
-    
-    evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
-    return evs[0]
+    evs = eigs(ham, k=1, sigma=0, which='LM', return_eigenvectors=False)
+    return np.abs(evs[0])
 
 
 for B in Bvals:
@@ -71,12 +72,14 @@ for B in Bvals:
     fh.write("#\t\tky\t\tphi\t\tB\t\tE\n")
     
     for phi in phi_vals:
+        t_start = time.time()
         for ky in kf_vals:
             ev = calc(ky=ky, phi=phi, B=B)
             ev = ev / gap
             fh.write("%g\t\t%g\t\t%g\t\t%g\n" %(ky, phi, B, ev))
             fh.flush()
             os.fsync(fh)
+        print("time k_y trace: %.2f s" % (time.time() - t_start))
         fh.write("\n")
         fh.flush()
         os.fsync(fh)
