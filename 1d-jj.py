@@ -73,6 +73,7 @@ for B in Bvals:
     for phi in phi_vals:
         for ky in kf_vals:
             ev = calc(ky=ky, phi=phi, B=B)
+            ev = ev / gap
             fh.write("%g\t\t%g\t\t%g\t\t%g\n" %(ky, phi, B, ev))
             fh.flush()
             os.fsync(fh)
