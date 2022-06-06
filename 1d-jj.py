@@ -12,8 +12,8 @@ mass =  0.03 * const.m_e
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 5e-6,
-    'junction_length': 5e-9,
+    'electrode_length': 1e-6,
+    'junction_length': 1e-9,
     'a': 5e-9,
     'g': -10
     }
@@ -30,10 +30,7 @@ alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
 potential = 0
 disorder = 0
 
-def calc(problem):
-    ky  = problem['ky']
-    phi = problem['phi']
-    B = problem['B']
+def calc(ky=None, phi=None, B=None):
 
     # kf_m = -mass * alpha / const.hbar**2 - \
     #     1/const.hbar * np.sqrt(mass**2 * alpha**2 / const.hbar**2 + 2 * mass * mu)
@@ -64,25 +61,26 @@ def calc(problem):
         salt='')
     
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, 1)
-    
-    data_file.log(evs, {'ky': ky, 'B': B, 'phi': phi})
+    return evs[0]
 
 
-num_cores = 120
+# num_cores = 120
 
 
 if __name__ == '__main__':
     phi_vals = np.linspace(-np.pi, np.pi, 100)
 #    potential_vals = np.linspace(0,0.5*mu,20)
     problems = []
-    Bvals = (0, 0.1, 0.5, 0.6) #np.linspace(0,0.6,100)
-    for phi in phi_vals:
-        for ky in np.linspace(-0.9*k_fermi,0.9*k_fermi, 100):
-            for B in Bvals:
-                problems.append({'ky': ky, 'phi': phi, 'B': B})
+    Bvals = (0, 0.2, 0.4, 0.5, 0.6) #np.linspace(0,0.6,100)
+    for B in Bvals:
         
-    with multiprocessing.Pool(num_cores) as p:
-        p.map(calc, problems)
+        for phi in phi_vals:
+            for ky in np.linspace(-0.9*k_fermi,0.9*k_fermi, 100):
+                ev = calc(ky=ky, phi=phi, B=B)
+                print(ev)
+                
+    # with multiprocessing.Pool(num_cores) as p:
+    #     p.map(calc, problems)
 
 
 

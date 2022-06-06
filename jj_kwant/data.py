@@ -76,14 +76,17 @@ class datafile:
             ev_value = number_format % ev
             line = params_line + number_delimiter + ev_value + "\n"
             self.datafile.write(line)
-        # new block
-        self.datafile.write("\n")
 
         # flush buffers
         self.datafile.flush()
         os.fsync(self.datafile)
             
-            
+    def new_block(self):
+        self.datafile.write("\n")
+        # flush buffers
+        self.datafile.flush()
+        os.fsync(self.datafile)
+        
             
                 
         
