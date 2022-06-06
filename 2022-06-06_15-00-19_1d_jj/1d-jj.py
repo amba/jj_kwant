@@ -15,14 +15,14 @@ mass =  0.03 * const.m_e
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 7e-6,
+    'electrode_length': 5e-6,
     'junction_length': 1e-9,
     'a': 5e-9,
     'g': -10
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
-Bvals = np.linspace(0,0.6,10)
+Bvals = (0, 0.2, 0.4, 0.5, 0.6) #np.linspace(0,0.6,100)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 kf_vals = np.linspace(-0.9*k_fermi, 0.9*k_fermi, 100)
