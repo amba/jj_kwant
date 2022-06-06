@@ -8,14 +8,14 @@ import pathlib
 import sys
 import shutil
 import os.path
-from scipy.sparse.linalg import eigs
+import scipy.sparse.linalg
 
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 1e-6,
+    'electrode_length': 2e-6,
     'junction_length': 1e-9,
     'a': 5e-9,
     'g': -10
@@ -62,25 +62,24 @@ def calc(ky=None, phi=None, B=None):
         mu=mu,
         alpha_rashba=alpha,
         salt='')
-    evs = eigs(ham, k=1, sigma=0, which='LM', return_eigenvectors=False)
+    evs = scipy.sparse.linalg.eigs(ham, k=1, sigma=0, which='LM', return_eigenvectors=False)
     return np.abs(evs[0])
 
 
 for B in Bvals:
     data_file = "data_B=%g.dat" % B
     fh = open(data_folder + "/" + data_file, "w")
-    fh.write("#\t\tky\t\tphi\t\tB\t\tE\n")
+    fh.write("#\t\tky\t\tphi\t\tB\t\tE\t\ttime\n")
+    t_start = time.time()
     
     for phi in phi_vals:
-        t_start = time.time()
         for ky in kf_vals:
             ev = calc(ky=ky, phi=phi, B=B)
             ev = ev / gap
             print("ev: ", ev)
-            fh.write("%g\t\t%g\t\t%g\t\t%g\n" %(ky, phi, B, ev))
+            fh.write("%g\t\t%g\t\t%g\t\t%g\t\t%g\n" %(ky, phi, B, ev, time.time() - t_start))
             fh.flush()
             os.fsync(fh)
-        print("time k_y trace: %.2f s" % (time.time() - t_start))
         fh.write("\n")
         fh.flush()
         os.fsync(fh)
