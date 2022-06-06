@@ -5,7 +5,9 @@ import scipy.constants as const
 import numpy as np
 import time
 import pathlib
-
+import sys
+import shutil
+import os.path
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
 args = {
