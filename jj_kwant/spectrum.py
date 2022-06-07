@@ -183,12 +183,9 @@ def _make_syst_jj_1d(
         ky=0,
         salt='',
 ):
-    print("making 1d JJ system:\n", locals())
     t = const_hbar**2 / (2 * m * a**2)
-    print("phi / π = %g" % (delta_phi / np.pi))
     L = int((2*electrode_length + junction_length) / a)
     L_junction = int(junction_length/a)
-    print("L = %d, L_junction = %d" % (L, L_junction))
     lat = kwant.lattice.chain(1)
     
 
@@ -268,12 +265,9 @@ def _make_syst_jj_1d(
 # API function
 
 def _hamiltonian(func, timing=True, *args, **kwargs):
-    t1 = time.time()
     syst = func(*args, **kwargs)
     ham_mat = syst.hamiltonian_submatrix(sparse=True)
-    print("Hamiltonian shape: ", ham_mat.shape)
     ham_mat = ham_mat.tocsc()
-    print("time to generate hamiltonian: %.2f s" % (time.time() - t1))
     return ham_mat
 
 def hamiltonian_jj_2d(timing=True, *args, **kwargs):
