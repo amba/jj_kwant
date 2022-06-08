@@ -18,13 +18,13 @@ g_factor_S = 0
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 7e-6,
+    'electrode_length': 4e-6,
     'junction_length': 100e-9,
     'a': 5e-9,
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
-Bvals = np.linspace(0,0.6,12)
+Bvals = np.linspace(0,10,10)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 kf_vals = np.linspace(-0.9*k_fermi, 0.9*k_fermi, 100)
