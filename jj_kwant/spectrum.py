@@ -171,15 +171,14 @@ def _make_syst_jj_1d(
         junction_length=100e-9,
         mu=None,
         gap_potential=0,
-        gap_potential_shape=None,
         gap=None,
         delta_phi=None,
         alpha_rashba=0,
         B=[0,0,0],
-        g_factor=-10,
+        g_factor_N=-10,
+        g_factor_S = 2,
         debug=False,
         disorder=0,
-        gap_disorder=0,
         ky=0,
         salt='',
 ):
@@ -199,7 +198,6 @@ def _make_syst_jj_1d(
         
         h0 = const_hbar**2 * ky**2 / (2*m) + \
             2*t - mu # 1D wire: 2t, not 4t
-        h0 = h0 + disorder * kwant.digest.gauss(site.pos, salt=salt)
             
         dphi = delta_phi
         
@@ -208,17 +206,14 @@ def _make_syst_jj_1d(
 
         start_junction = int((L - L_junction) / 2)
         pairing = 0
-        real_gap = gap + gap_disorder * kwant.digest.gauss(site.pos, salt=salt)
+
         if x < start_junction or x >= start_junction + L_junction:
             pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), real_gap * sigma_0)
+            g_factor = g_factor_S
         else:
-            if gap_potential_shape == 'cosine_half':
-                h0 = h0 + gap_potential*np.cos(2*np.pi * (x - L/2) / (2*L_junction))
-            elif gap_potential_shape == 'cosine':
-                h0 = h0 + gap_potential*1/2 * (1 + np.cos(2*np.pi * (x - L/2) / L_junction))
-            else:
-                h0 = h0 + gap_potential
-        
+            g_factor = g_factor_N
+            h0 = h0 + gap_potential
+            
         # from "a josephson supercurrent diode" paper supplement
         zeeman = 0.5 * g_factor * const_bohr_magneton * (B[0] * sigma_x + B[1] * sigma_y + B[2] * sigma_z)
 

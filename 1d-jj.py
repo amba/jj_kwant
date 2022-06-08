@@ -12,13 +12,15 @@ import scipy.sparse.linalg
 
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
+g_factor_N = -10
+g_factor_S = 0
+
 args = {
     'mass': mass,
     'gap': gap,
     'electrode_length': 7e-6,
-    'junction_length': 1e-9,
+    'junction_length': 100e-9,
     'a': 5e-9,
-    'g': -10
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
@@ -42,8 +44,6 @@ shutil.copyfile(script, data_folder + '/' + os.path.basename(script))
 
 
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
-potential = 0
-disorder = 0
 
 def calc(ky=None, phi=None, B=None):
     ham = jj_kwant.spectrum.hamiltonian_jj_1d(
@@ -56,9 +56,8 @@ def calc(ky=None, phi=None, B=None):
         gap=gap,
         B=[0,B,0],
         delta_phi = phi,
-        g_factor=args['g'],
-        disorder=disorder,
-        gap_potential = potential,
+        g_factor_N = g_factor_N,
+        g_factor_S = g_factor_S,
         mu=mu,
         alpha_rashba=alpha,
         salt='')
