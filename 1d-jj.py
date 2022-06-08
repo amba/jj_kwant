@@ -24,7 +24,7 @@ args = {
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
-Bvals = np.linspace(0,0.6,10)
+Bvals = np.linspace(0,0.6,12)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 kf_vals = np.linspace(-0.9*k_fermi, 0.9*k_fermi, 100)
@@ -66,7 +66,7 @@ def calc(ky=None, phi=None, B=None):
 
 
 for B in Bvals:
-    data_file = "data_B=%g.dat" % B
+    data_file = "data_B=%.2g.dat" % B
     fh = open(data_folder + "/" + data_file, "w")
     fh.write("#\t\tky\t\tphi\t\tB\t\tE\t\ttime\n")
     t_start = time.time()
