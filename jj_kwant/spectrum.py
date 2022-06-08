@@ -208,7 +208,7 @@ def _make_syst_jj_1d(
         pairing = 0
 
         if x < start_junction or x >= start_junction + L_junction:
-            pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), real_gap * sigma_0)
+            pairing =  np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), gap * sigma_0)
             g_factor = g_factor_S
         else:
             g_factor = g_factor_N
