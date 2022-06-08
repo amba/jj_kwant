@@ -13,7 +13,7 @@ import scipy.sparse.linalg
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
 g_factor_N = -10
-g_factor_S = 2
+g_factor_S = 0
 
 args = {
     'mass': mass,
@@ -24,7 +24,7 @@ args = {
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
-Bvals = np.linspace(2,0,11)
+Bvals = np.linspace(0,100,11)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 kf_vals = np.linspace(-0.9*k_fermi, 0.9*k_fermi, 100)

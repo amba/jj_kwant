@@ -8,23 +8,21 @@ import pathlib
 import sys
 import shutil
 import os.path
-import scipy.sparse.linalg
+from scipy.sparse.linalg import eigs
 
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
-g_factor_N = -10
-g_factor_S = 2
-
 args = {
     'mass': mass,
     'gap': gap,
-    'electrode_length': 4e-6,
-    'junction_length': 100e-9,
+    'electrode_length': 1e-6,
+    'junction_length': 1e-9,
     'a': 5e-9,
+    'g': -10
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
-Bvals = np.linspace(2,0,11)
+Bvals = (0, 0.2, 0.4, 0.5, 0.6) #np.linspace(0,0.6,100)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 kf_vals = np.linspace(-0.9*k_fermi, 0.9*k_fermi, 100)
@@ -44,6 +42,8 @@ shutil.copyfile(script, data_folder + '/' + os.path.basename(script))
 
 
 alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
+potential = 0
+disorder = 0
 
 def calc(ky=None, phi=None, B=None):
     ham = jj_kwant.spectrum.hamiltonian_jj_1d(
@@ -56,29 +56,31 @@ def calc(ky=None, phi=None, B=None):
         gap=gap,
         B=[0,B,0],
         delta_phi = phi,
-        g_factor_N = g_factor_N,
-        g_factor_S = g_factor_S,
+        g_factor=args['g'],
+        disorder=disorder,
+        gap_potential = potential,
         mu=mu,
         alpha_rashba=alpha,
         salt='')
-    evs = scipy.sparse.linalg.eigs(ham, k=1, sigma=0, which='LM', return_eigenvectors=False)
+    evs = eigs(ham, k=1, sigma=0, which='LM', return_eigenvectors=False)
     return np.abs(evs[0])
 
 
 for B in Bvals:
-    data_file = "data_B=%.2g.dat" % B
+    data_file = "data_B=%g.dat" % B
     fh = open(data_folder + "/" + data_file, "w")
-    fh.write("#\t\tky\t\tphi\t\tB\t\tE\t\ttime\n")
-    t_start = time.time()
+    fh.write("#\t\tky\t\tphi\t\tB\t\tE\n")
     
     for phi in phi_vals:
+        t_start = time.time()
         for ky in kf_vals:
             ev = calc(ky=ky, phi=phi, B=B)
             ev = ev / gap
             print("ev: ", ev)
-            fh.write("%g\t\t%g\t\t%g\t\t%g\t\t%g\n" %(ky, phi, B, ev, time.time() - t_start))
+            fh.write("%g\t\t%g\t\t%g\t\t%g\n" %(ky, phi, B, ev))
             fh.flush()
             os.fsync(fh)
+        print("time k_y trace: %.2f s" % (time.time() - t_start))
         fh.write("\n")
         fh.flush()
         os.fsync(fh)
