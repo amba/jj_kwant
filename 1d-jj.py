@@ -24,7 +24,7 @@ args = {
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
-Bvals = np.linspace(2,0,11)
+Bvals = np.linspace(2,0,21)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 
