@@ -30,7 +30,7 @@ k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 
 # α m / (hbar**2 k_f) = 0.6
 alpha = 0.6 * const.hbar**2 * mass / k_fermi
-print("alpha = %g meV nm" % (alpha / (e * 1e-3 * 1e-9)))
+print("alpha = %g meV nm" % (alpha / (const.e * 1e-3 * 1e-9)))
 
 
 kf_vals = np.linspace(-0.9*k_fermi, 0.9*k_fermi, 100)
