@@ -27,6 +27,12 @@ phi_vals = np.linspace(-np.pi, np.pi, 100)
 Bvals = np.linspace(2,0,11)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
+
+# α m / (hbar**2 k_f) = 0.6
+alpha = 0.6 * hbar**2 * mass / k_fermi
+print("alpha = %g meV nm" % (alpha / (e * 1e-3 * 1e-9)))
+
+
 kf_vals = np.linspace(-0.9*k_fermi, 0.9*k_fermi, 100)
 print("k_F = ", k_fermi)
 
@@ -43,7 +49,6 @@ shutil.copyfile(script, data_folder + '/' + os.path.basename(script))
 
 
 
-alpha = 20e-3 * const.e * 1e-9 # 20 meV nm
 
 def calc(ky=None, phi=None, B=None):
     ham = jj_kwant.spectrum.hamiltonian_jj_1d(
