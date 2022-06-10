@@ -13,23 +13,24 @@ import scipy.sparse.linalg
 gap = 100e-6 * const.e
 mass =  0.03 * const.m_e
 g_factor_N = -10
-g_factor_S = 2
+g_factor_S = -10
 
 args = {
     'mass': mass,
     'gap': gap,
     'electrode_length': 4e-6,
-    'junction_length': 100e-9,
+    'junction_length': 1e-6,
     'a': 5e-9,
     }
 
 phi_vals = np.linspace(-np.pi, np.pi, 100)
-Bvals = np.linspace(2,0,21)
+Bvals = np.linspace(0,1,11)
 mu = 100e-3 * const.e
 k_fermi = 1/const.hbar * np.sqrt(2 * mass * mu)
 
 # α m / (hbar**2 k_f) = 0.6
-alpha = 0.6 * const.hbar**2 * k_fermi / mass
+alpha = 20e-3 * const.e * 1e-9
+#alpha = 0.6 * const.hbar**2 * k_fermi / mass
 print("alpha = %g meV nm" % (alpha / (const.e * 1e-3 * 1e-9)))
 
 
