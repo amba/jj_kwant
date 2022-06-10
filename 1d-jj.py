@@ -34,7 +34,7 @@ alpha = 20e-3 * const.e * 1e-9
 print("alpha = %g meV nm" % (alpha / (const.e * 1e-3 * 1e-9)))
 
 
-kf_vals = np.linspace(k_fermi, k_fermi, 100)
+kf_vals = np.linspace(-k_fermi, k_fermi, 100)
 print("k_F = ", k_fermi)
 
 # make new datafolder
