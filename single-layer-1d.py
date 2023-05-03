@@ -18,7 +18,6 @@ t = const_hbar**2 / (2 * m * a**2)
 delta = 250e-6 * const_e
 t_prime = 200e-6* const_e
 print("t / t_prime = ", t/t_prime)
-W = 2
 L = 500
 L_junction = 20
 mu = 50e-3 * const_e
@@ -46,10 +45,10 @@ def make_system(
         alpha_rashba = 15e-3 * const_e * 1e-9
 ):
     syst = kwant.Builder()
-    lat = kwant.lattice.square(1)
+    lat = kwant.lattice.chain(1)
 
     def onsite(site):
-        x, y = site.pos
+        (x,) = site.pos
         pairing = 0
         h0 = 2*t -mu
         dphi = delta_phi
@@ -57,12 +56,11 @@ def make_system(
         if x > L/2:
             dphi = -dphi
             #print("mu = ", mu)
-        if y == 1:
+
+        if abs(x-L/2) > L_junction/2:
             pairing = np.kron(tau_x * np.cos(dphi/2) - tau_y * np.sin(dphi/2), sigma_0)
             pairing *= delta
-            zeeman = 0 * sigma_y
-        else:
-            zeeman =  0.5 * g_factor * const_bohr_magneton * B * sigma_y
+        zeeman =  0.5 * g_factor * const_bohr_magneton * B * sigma_y
             
         
         h0 = h0 * sigma_0
@@ -70,58 +68,22 @@ def make_system(
 
         
         
-    syst[(lat(x,y) for x in range(L) for y in range(W))] = onsite
+    syst[(lat(x) for x in range(L))] = onsite
 
     # intra-layer hopping with rashba term
     print("alpha_rashba = ", alpha_rashba / (1e-3 * const_e) / 1e-9)
     print("a = ", a)
-    for i in range(L):
-        if i > 0:
-            # 2DEG: add Rashba term
-            syst[lat(i, 0), lat(i-1, 0)] = np.kron(tau_z, -t*sigma_0 - 1j/(2*a) * alpha_rashba * sigma_y)
-            # SC
-            syst[lat(i, 1), lat(i-1, 1)] =  np.kron(tau_z, -t*sigma_0 - 1j/(2*a) * alpha_rashba * sigma_y)# np.kron(tau_z, -t*sigma_0)
-        # inter-layer hopping (delta*)
-        syst[lat(i, 1), lat(i, 0)] = np.kron(tau_z, -t_prime * sigma_0) 
+    syst[kwant.builder.HoppingKind((1,), lat, lat)] = \
+         np.kron(tau_z, -t * sigma_0 -1j/(2*a) * alpha_rashba * sigma_y)
 
-
-    
- #    syst[kwant.builder.HoppingKind((1, 0), lat, lat)] = \
- # np.kron(tau_z, -t*sigma_0 - 1j/(2*a) * alpha_rashba * sigma_y)
- #    syst[kwant.builder.HoppingKind((0, 1), lat, lat)] = np.kron(tau_z, -t_prime * sigma_0) 
-
-
-
-    def in_jj(site):
-        x, y = site.pos
-        return abs(x-L/2) < L_junction/2 and y == 1
-
-    for site in filter(in_jj, list(syst.sites())):
-        del syst[site]
-    sites = syst.sites()
     syst = syst.finalized()
     ham_mat = syst.hamiltonian_submatrix(sparse=True)
     ham_mat = ham_mat.tocsc()
     return ham_mat
 
-
-# sites, ham_mat = make_system(delta_phi=0*np.pi)
-# positions = [site.pos for site in sites]
-# x_positions = np.array([pos[0] for pos in positions])
-
-# print(positions)
-# evals,evec = ssl.eigsh(ham_mat, k=1, sigma=0, which='LA', return_eigenvectors=True)
-# evec = evec[:,0]
-# print(evec.shape)
-# wf = np.abs(evec[0::2]) + np.abs(evec[1::2])
-
-# # print(wf.shape)
-# #plt.yscale('log')
-# plt.plot(x_positions, wf)
-# plt.show()
 delta_phi_vals = np.linspace(-1*np.pi, 1*np.pi, 31)
 
-for alpha_rashba in np.linspace(0, 5e-3 * const_e * 1e-9, 5):
+for alpha_rashba in np.linspace(0, 100e-3 * const_e * 1e-9, 5):
     print("α = %g meV nm" % (alpha_rashba / (1e-3*const_e) / 1e-9))
     F_vals = []
     spectrum = []
@@ -129,7 +91,7 @@ for alpha_rashba in np.linspace(0, 5e-3 * const_e * 1e-9, 5):
         print("delta_phi = ", delta_phi / np.pi)
     
         ham_mat = make_system(delta_phi=delta_phi,B=0.1,alpha_rashba=alpha_rashba)
-        evals = ssl.eigsh(ham_mat, k=2, sigma=0, which='LA', return_eigenvectors=False)
+        evals = ssl.eigsh(ham_mat, k=6, sigma=0, which='LA', return_eigenvectors=False)
         spectrum.append(evals)
         F = -np.sum(evals)
         F_vals.append(F)
