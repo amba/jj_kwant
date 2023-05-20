@@ -42,7 +42,7 @@ tau_z = tinyarray.array([[1, 0], [0,-1]])
 
 # internal function
 def _make_syst_jj_2d(
-        m = 0.03 * const_m_e,
+        m = 0.04 * const_m_e,
         a=5e-9,
         width=3e-6,
         electrode_length = 3e-6,
