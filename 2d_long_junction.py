@@ -16,7 +16,7 @@ a = 5e-9
 mu = 50e-3 * const.e
 
 mass = 0.04 * const.m_e
-width = 3e-6
+width = 0.5e-6
 junction_length = 2e-6
 electrode_length = 2e-6
 
@@ -60,7 +60,7 @@ def calc(problem):
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, N_bound_states)
     
     print("logging evs")
-    data_file.log(evs, {'phi': phi, 'disorder': disorder, 'B': B, 'mu': mu, 's_xx': SOI[0,0], 's_xy': SOI[0,1], 's_yx': SOI[1,0], 's_yy': SOI[1,1], 'diff': diff})
+    data_file.log(evs, {'phi': phi, 'disorder': disorder, 'B': B, 'mu': mu, 's_xx': SOI[0,0], 's_xy': SOI[0,1], 's_yx': SOI[1,0], 's_yy': SOI[1,1]})
 
 
 
