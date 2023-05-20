@@ -16,7 +16,7 @@ a = 5e-9
 mu = 50e-3 * const.e
 
 mass = 0.04 * const.m_e
-width = 0.5e-6
+width = 0.05e-6
 junction_length = 2e-6
 electrode_length = 2e-6
 
@@ -36,7 +36,8 @@ def calc(problem):
     mu = problem['mu']
     phi = problem['phi']
     B = problem['B']
-    SOI = problem['soi'] # 2x2 matrix
+    alpha = problem['alpha']
+    SOI = np.array([[0, alpha], [-alpha, 0]])
     disorder = problem['disorder']
 
     ham = jj_kwant.spectrum.hamiltonian_jj_2d(
@@ -60,17 +61,17 @@ def calc(problem):
     evs = jj_kwant.spectrum.positive_low_energy_spectrum(ham, N_bound_states)
     
     print("logging evs")
-    data_file.log(evs, {'phi': phi, 'disorder': disorder, 'B': B, 'mu': mu, 's_xx': SOI[0,0], 's_xy': SOI[0,1], 's_yx': SOI[1,0], 's_yy': SOI[1,1]})
+    data_file.log(evs, {'phi': phi, 'disorder': disorder, 'B': B, 'mu': mu, 'alpha': alpha})
 
 
 
 
 
 if __name__ == '__main__':
-    B = 0
+    B = 0.1
     phi = np.pi
     disorder = 0
-    SOI = np.array([[0, alpha], [-alpha, 0]])
+ 
 
     phi_vals = np.linspace(-1,1,51) * np.pi
     problems = []
@@ -78,7 +79,7 @@ if __name__ == '__main__':
     for phi in phi_vals:
                     calc({
                         'mu': mu, 'phi': phi, 'B': B,
-                        'soi': SOI,
+                        'alpha': alpha,
                         'disorder': disorder,
                     })
 
