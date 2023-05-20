@@ -5,7 +5,6 @@ import scipy.constants as const
 import numpy as np
 import jj_kwant.data
 import time
-import multiprocessing
 import psutil
 import random
 
@@ -31,14 +30,6 @@ print("N_bound_states = ", N_bound_states)
 
 data_file = jj_kwant.data.datafile(folder="long_junction", params=['phi', 'disorder', 'B', 'mu', 'alpha'])
 
-def wait_for_mem():
-    while True:
-        mem_percent = psutil.virtual_memory().percent
-        if mem_percent < 90:
-            break;
-        else:
-            print("cannot start process. used memory is %.1f percent" % mem_percent)
-            time.sleep(600 * random.random())
 
 start_time = time.time()            
 def calc(problem):
@@ -85,15 +76,13 @@ if __name__ == '__main__':
     problems = []
     
     for phi in phi_vals:
-                    problems.append({
+                    calc({
                         'mu': mu, 'phi': phi, 'B': B,
                         'soi': SOI,
                         'disorder': disorder,
                     })
 
                     
-    with multiprocessing.Pool(num_cores) as p:
-        p.map(calc, problems)
     
 
     
